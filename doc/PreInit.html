@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+
+  <title>Module: PreInit</title>
+
+  <link rel="stylesheet" href="./rdoc.css" type="text/css" media="screen" />
+
+  <script src="./js/jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./js/thickbox-compressed.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./js/quicksearch.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./js/darkfish.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+<body id="top" class="module">
+
+  <div id="metadata">
+    <div id="home-metadata">
+      <div id="home-section" class="section">
+        <h3 class="section-header">
+          <a href="./index.html">Home</a>
+          <a href="./index.html#classes">Classes</a>
+          <a href="./index.html#methods">Methods</a>
+        </h3>
+      </div>
+    </div>
+
+    <div id="file-metadata">
+      <div id="file-list-section" class="section">
+        <h3 class="section-header">In Files</h3>
+        <div class="section-body">
+          <ul>
+          
+            <li><a href="./lib/preinit_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+              class="thickbox" title="lib/preinit.rb">lib/preinit.rb</a></li>
+          
+          </ul>
+        </div>
+      </div>
+
+      
+    </div>
+
+    <div id="class-metadata">
+      
+
+      
+
+      
+
+      
+      <!-- Method Quickref -->
+      <div id="method-list-section" class="section">
+        <h3 class="section-header">Methods</h3>
+        <ul class="link-list">
+          
+          <li><a href="#method-c-new">::new</a></li>
+          
+          <li><a href="#method-i-load_attrs">#load_attrs</a></li>
+          
+        </ul>
+      </div>
+      
+
+      
+    </div>
+
+    <div id="project-metadata">
+      
+      
+      <div id="fileindex-section" class="section project-section">
+        <h3 class="section-header">Files</h3>
+        <ul>
+        
+          <li class="file"><a href="./History_txt.html">History.txt</a></li>
+        
+          <li class="file"><a href="./Manifest_txt.html">Manifest.txt</a></li>
+        
+          <li class="file"><a href="./PostInstall_txt.html">PostInstall.txt</a></li>
+        
+          <li class="file"><a href="./website/index_txt.html">index.txt</a></li>
+        
+        </ul>
+      </div>
+      
+
+      <div id="classindex-section" class="section project-section">
+        <h3 class="section-header">Class/Module Index
+          <span class="search-toggle"><img src="./images/find.png"
+            height="16" width="16" alt="[+]"
+            title="show/hide quicksearch" /></span></h3>
+        <form action="#" method="get" accept-charset="utf-8" class="initially-hidden">
+        <fieldset>
+          <legend>Quicksearch</legend>
+          <input type="text" name="quicksearch" value=""
+            class="quicksearch-field" />
+        </fieldset>
+        </form>
+
+        <ul class="link-list">
+        
+          <li><a href="./PreInit.html">PreInit</a></li>
+        
+        </ul>
+        <div id="no-class-search-results" style="display: none;">No matching classes.</div>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <div id="documentation">
+    <h1 class="module">PreInit</h1>
+
+    <div id="description" class="description">
+      
+    </div><!-- description -->
+
+    
+    <div id="5Buntitled-5D" class="documentation-section">
+      
+
+      
+
+      
+      <!-- Constants -->
+      <div id="constants-list" class="section">
+        <h3 class="section-header">Constants</h3>
+        <dl>
+        
+          <dt><a name="VERSION">VERSION</a></dt>
+          
+          <dd class="description"><p><a href="PreInit.html#Version">Version</a> number as an extractable string.</p></dd>
+          
+        
+          <dt><a name="Version">Version</a></dt>
+          
+          <dd class="description"><p><a href="PreInit.html#Version">Version</a> number as a <em>Versionomy</em>
+object.</p></dd>
+          
+        
+        </dl>
+      </div>
+      
+
+      
+      <!-- Attributes -->
+      <div id="attribute-method-details" class="method-section section">
+        <h3 class="section-header">Attributes</h3>
+
+        
+        <div id="preinit_options-attribute-method" class="method-detail">
+          <a name="preinit_options"></a>
+          
+          <div class="method-heading attribute-method-heading">
+            <span class="method-name">preinit_options</span><span
+              class="attribute-access-type">[R]</span>
+          </div>
+
+          <div class="method-description">
+          
+          <p>Hash of controls affecting how the constructor functions.</p>
+<dl class="rdoc-list"><dt><tt>:default</tt></dt>
+<dd>
+<p><em>Any</em>.  Default value to assign if an instance variable is specified
+without one (<em>e.g.</em> <tt>new({}, 'varname')</tt>).</p>
+</dd><dt><tt>:on_NameError</tt></dt>
+<dd>
+<p><em>Symbol</em>.  Action to take if an invalid instance variable name
+appears in the hash.</p>
+<dl class="rdoc-list"><dt><tt>:raise</tt></dt>
+<dd>
+<p>A <em>NameError</em> exception will be raised identifying the invalid name.</p>
+</dd><dt><tt>:ignore</tt></dt>
+<dd>
+<p>The key/value pair with the invalid name will be silently ignored.</p>
+</dd><dt><tt>:convert</tt></dt>
+<dd>
+<p>An attempt will be made to make the name valid (<em>e.g.</em>, replacing
+illegal characters with ‘<tt>_</tt>’, <em>etc.</em>).</p>
+</dd></dl>
+</dd></dl>
+          
+          </div>
+        </div>
+        
+      </div><!-- attribute-method-details -->
+      
+
+      <!-- Methods -->
+      
+      <div id="public-class-method-details" class="method-section section">
+        <h3 class="section-header">Public Class Methods</h3>
+
+      
+        <div id="new-method" class="method-detail ">
+          <a name="method-c-new"></a>
+
+          
+          
+          <div class="method-heading">
+            <span class="method-callseq">new<i>(*args)</i> => <i>object</i></span>
+            
+            <span class="method-click-advice">click to toggle source</span>
+            
+          </div>
+          
+          <div class="method-heading">
+            <span class="method-callseq">new<i>[(options[, *args])] { |obj,*args| block }</i> => <i>object</i></span>
+            
+          </div>
+          
+          
+
+          <div class="method-description">
+            
+            <h3>Description</h3>
+
+<p>Create a new instance of the current class, and set instance variables in
+it according to the key/value pairs in any hashes that were passed.</p>
+
+<h3>Arguments</h3>
+<dl class="rdoc-list"><dt><em>*args</em></dt>
+<dd>
+<p><em>Array</em> of <em>Hash</em> (zero or more). An optional collection of
+name/value pairs. The names (keys) will be treated as names of instance
+variables, and the values as their initial contents.</p>
+</dd><dt><em>options</em></dt>
+<dd>
+<p><em>Hash</em>.  Control settings for how the <em><a
+href="PreInit.html">PreInit</a></em> constructor should handle its
+operation when processing <em>*args</em>.  (See the <a
+href="preinit_options">preinit_options</a> section for details.)</p>
+</dd></dl>
+
+<h3>Examples</h3>
+
+<pre>class Foo
+  include PreInit
+end
+ex_1 = Foo.new(:ivar1 =&gt; 1, 'ivar2' =&gt; ['an', 'array'])
+=&gt; #&lt;Foo:0xb7551b50 @ivar2=[&quot;an&quot;, &quot;array&quot;], @preinit_options={}, @ivar1=1&gt;
+
+ex_2 = Foo.new({ :op1 =&gt; 1 }, 17) { |o,*args|
+  args.each_with_index do |arg,i|
+    o.instance_variable_set(&quot;@new_ivar_#{i}&quot;.to_sym, arg)
+  end
+}
+=&gt; #&lt;Foo:0xb7547de4 @preinit_options={:op1=&gt;1}, @new_ivar_0=17&gt;</pre>
+
+<h3>Exceptions</h3>
+<dl class="rdoc-list"><dt><tt>NameError</tt></dt>
+<dd>
+<p>The name in one of the tuples could not be converted to an instance
+variable name.</p>
+</dd></dl>
+            
+
+            
+            <div class="method-source-code" id="new-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 133</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(*<span class="ruby-identifier">args</span>)
+  <span class="ruby-ivar">@preinit_options</span> = {}
+  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span>)
+    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
+      <span class="ruby-ivar">@preinit_options</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">yield</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">load_attrs</span>(*<span class="ruby-identifier">args</span>) <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- new-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- new-method -->
+
+      
+      </div><!-- public-class-method-details -->
+    
+      <div id="public-instance-method-details" class="method-section section">
+        <h3 class="section-header">Public Instance Methods</h3>
+
+      
+        <div id="load_attrs-method" class="method-detail ">
+          <a name="method-i-load_attrs"></a>
+
+          
+          
+          <div class="method-heading">
+            <span class="method-callseq">new<i>([val], [bitcount])</i> => <i>BitString</i></span>
+            
+            <span class="method-click-advice">click to toggle source</span>
+            
+          </div>
+          
+          <div class="method-heading">
+            <span class="method-callseq">new<i>(length) {|index| block }</i> => <i>BitString</i></span>
+            
+          </div>
+          
+          
+
+          <div class="method-description">
+            
+            <h3>Description</h3>
+
+<p>Create a new <em>BitString</em> object.  By default, it will be unbounded
+and all bits clear.</p>
+
+<h3>Arguments</h3>
+<dl class="rdoc-list"><dt><em>val</em></dt>
+<dd>
+<p><em>Array</em>, <em>Integer</em>, <em>String</em>, or <em>BitString</em>.
+Initial value for the bitstring.  If a <em>String</em>, the value must
+contain only ‘0’ and ‘1’ characters; if an <em>Array</em>, all
+elements must be 0 or 1.  Default 0.</p>
+</dd><dt><em>bitcount</em></dt>
+<dd>
+<p><em>Integer</em>.  Optional length (number of bits) for a bounded
+bitstring.</p>
+</dd></dl>
+
+<h3>Examples</h3>
+
+<pre>bs = BitString.new(4095)
+bs.to_s
+=&gt; &quot;111111111111&quot;
+bs.bounded?
+=&gt; false
+
+bs = BitString.new('110000010111', 12)
+bs.bounded?
+=&gt; true
+bs.to_i
+=&gt; 3095
+
+bs = BitString.new(12) { |pos| pos % 2 }
+bs.to_s
+=&gt; &quot;101010101010&quot;</pre>
+
+<h3>Exceptions</h3>
+<dl class="rdoc-list"><dt><tt>RangeError</tt></dt>
+<dd>
+<p><em>val</em> is a string, but contains non-binary digits.</p>
+</dd></dl>
+
+<p>Allow loading of values from a hash into an existing object, not just at
+instantiation.  Kinda like Hash.merge! – but also not.</p>
+            
+
+            
+            <div class="method-source-code" id="load_attrs-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 183</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">load_attrs</span>(*<span class="ruby-identifier">args</span>)
+  <span class="ruby-keyword">while</span> (<span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>)
+    <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
+    <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attr</span>,<span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">ivar</span> = <span class="ruby-identifier">attr</span>
+      <span class="ruby-comment">#</span>
+      <span class="ruby-comment"># TODO: Vet method name</span>
+      <span class="ruby-comment">#</span>
+      <span class="ruby-comment"># Here is where we need to worry about a key not being a</span>
+      <span class="ruby-comment"># valid method name (like 'foo-bar' =&gt; 'val').  What to do with</span>
+      <span class="ruby-comment"># such?</span>
+      <span class="ruby-comment">#</span>
+      <span class="ruby-identifier">setmeth</span> = <span class="ruby-node">&quot;#{ivar.to_s}=&quot;</span>.<span class="ruby-identifier">to_sym</span>
+      <span class="ruby-comment">#</span>
+      <span class="ruby-comment"># If there's already a 'foo=' method, use it rather than</span>
+      <span class="ruby-comment"># just setting the instance variable directly -- thus preserving</span>
+      <span class="ruby-comment"># any special processing the class has for the variable.</span>
+      <span class="ruby-comment">#</span>
+      <span class="ruby-keyword">if</span> (<span class="ruby-keyword">self</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">setmeth</span>))
+        <span class="ruby-keyword">self</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">setmeth</span>, <span class="ruby-identifier">val</span>)
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-keyword">self</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{ivar.to_s}&quot;</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">val</span>)
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- load_attrs-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- load_attrs-method -->
+
+      
+      </div><!-- public-instance-method-details -->
+    
+    </div><!-- 5Buntitled-5D -->
+  
+
+  </div><!-- documentation -->
+
+  <div id="validator-badges">
+    <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+    <p><small>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish
+      Rdoc Generator</a> 2</small>.</p>
+  </div>
+
+</body>
+</html>
+
