@@ -58,6 +58,10 @@ end
 require 'rubygems'
 require 'versionomy'
 
+require 'pp'
+require 'ruby-debug'
+Debugger.start
+
 module PreInit
 
   #
@@ -131,81 +135,94 @@ module PreInit
   # [<tt>NameError</tt>] The name in one of the tuples could not be converted
   #                      to an instance variable name.
   #
-  def initialize(*args)
-    @preinit_options = {}
-    if (block_given?)
-      if (args[0].kind_of?(Hash))
-        @preinit_options = args.shift
-      end
-      yield(self, *args)
-    else
-      load_attrs(*args) unless (args.empty?)
+  def initialize(*args, &block)
+    @preinit_options = {
+      :on_NameError	=> :raise,
+    }
+    if (block_given? && (args[0].kind_of?(Hash)))
+      @preinit_options.merge!(args.shift)
     end
+    load_attrs(*args, &block) if (block_given? || (! args.empty?))
   end
 
   #
   # === Description
   #
-  # Create a new <i>BitString</i> object.  By default, it will be unbounded and
-  # all bits clear.
+  # Handle the turning of a set of tuples into instance variables and values.
+  # This is invoked behind the scenes by <i>new</i>, but can be invoked on
+  # an existing object in order to update or add values.
   #
   # :call-seq:
-  # new<i>([val], [bitcount])</i> => <i>BitString</i>
-  # new<i>(length) {|index| block }</i> => <i>BitString</i>
+  # load_attrs<i>(*args)</i> => <i>object</i>
+  # load_attrs<i>[(*args)] { |obj,*args| block }</i> => <i>object</i>
   #
   # === Arguments
-  # [<i>val</i>] <i>Array</i>, <i>Integer</i>, <i>String</i>, or <i>BitString</i>. Initial value for the bitstring.  If a <i>String</i>, the value must contain only '0' and '1' characters; if an <i>Array</i>, all elements must be 0 or 1.  Default 0.
-  # [<i>bitcount</i>] <i>Integer</i>.  Optional length (number of bits) for a bounded bitstring.
+  # [<i>*args</i>] <i>Array</i> of <i>Hash</i> (zero or more).
+  #                An optional collection of name/value pairs.
+  #                The names (keys) will be treated as names of
+  #                instance variables, and the values as their
+  #                initial contents.
   #
   # === Examples
-  #  bs = BitString.new(4095)
-  #  bs.to_s
-  #  => "111111111111"
-  #  bs.bounded?
-  #  => false
+  #  class Foo
+  #    include PreInit
+  #  end
+  #  ex_1 = Foo.new
+  #  ex_1.load_attrs(:ivar1 => 1, 'ivar2' => ['an', 'array'])
+  #  => #<Foo:0xb7551b50 @ivar2=["an", "array"], @preinit_options={}, @ivar1=1>
   #
-  #  bs = BitString.new('110000010111', 12)
-  #  bs.bounded?
-  #  => true
-  #  bs.to_i
-  #  => 3095
-  #
-  #  bs = BitString.new(12) { |pos| pos % 2 }
-  #  bs.to_s
-  #  => "101010101010"
+  #  ex_2 = Foo.new
+  #  ex_2.load_attrs({ :op1 => 1 }, 17) { |o,*args|
+  #    args.each_with_index do |arg,i|
+  #      o.instance_variable_set("@new_ivar_#{i}".to_sym, arg)
+  #    end
+  #  }
+  #  => #<Foo:0xb7547de4 @preinit_options={:op1=>1}, @new_ivar_0=17>
   #
   # === Exceptions
-  # [<tt>RangeError</tt>] <i>val</i> is a string, but contains non-binary digits.
-  #
-  #
-  # Allow loading of values from a hash into an existing object, not
-  # just at instantiation.  Kinda like Hash.merge! -- but also not.
+  # [<tt>NameError</tt>] The name in one of the tuples could not be converted
+  #                      to an instance variable name.
   #
   def load_attrs(*args)
     while (arg = args.shift)
-      next unless (arg.kind_of?(Hash))
-      arg.each do |attr,val|
-        ivar = attr
-        #
-        # TODO: Vet method name
+      next unless (block_given? || arg.kind_of?(Hash))
+      arg.each do |*segs|
+        if (block_given?)
+          yield(self, *segs)
+          next
+        end
+        (ivar, ival) = segs.shift
         #
         # Here is where we need to worry about a key not being a
         # valid method name (like 'foo-bar' => 'val').  What to do with
         # such?
         #
-        setmeth = "#{ivar.to_s}=".to_sym
+        ivar = ivar.to_s.dup
+        if (ivar !~ %r!^[_a-z0-9]+$!i)
+          case @preinit_options[:on_NameError]
+          when :ignore
+            next
+          when :convert
+            ivar.gsub!(%r![^_a-z0-9]!i, '_')
+            ivar.gsub!(%r!_{2,}!, '_')
+          when :raise
+            raise NameError.new("Illegal instance variable name: '#{ivar}'")
+          end
+        end
+        setmeth = "#{ivar}=".to_sym
         #
         # If there's already a 'foo=' method, use it rather than
         # just setting the instance variable directly -- thus preserving
         # any special processing the class has for the variable.
         #
         if (self.respond_to?(setmeth))
-          self.send(setmeth, val)
+          self.send(setmeth, ival)
         else
-          self.instance_variable_set("@#{ivar.to_s}".to_sym, val)
+          self.instance_variable_set("@#{ivar}".to_sym, ival)
         end
       end
     end
+    return self
   end
 
 end
