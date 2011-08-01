@@ -210,14 +210,9 @@ constructor.</p>
           
           
           <div class="method-heading">
-            <span class="method-callseq">new<i>[(*args)]</i> => <i>object</i></span>
+            <span class="method-callseq">new<i>[(hsh)]</i> => <i>object</i></span>
             
             <span class="method-click-advice">click to toggle source</span>
-            
-          </div>
-          
-          <div class="method-heading">
-            <span class="method-callseq">new<i>[(*args)] { |obj,*args| block }</i> => <i>object</i></span>
             
           </div>
           
@@ -231,15 +226,13 @@ constructor.</p>
 it according to the key/value pairs in any hashes that were passed.</p>
 
 <h3>Arguments</h3>
-<dl class="rdoc-list"><dt><em>*args</em></dt>
+<dl class="rdoc-list"><dt><em>hsh</em></dt>
 <dd>
-<p><em>Array</em> of <em>Hash</em> (zero or more). An optional collection of
-name/value pairs. The names (keys) will be treated as names of instance
-variables, and the values as their initial contents.</p>
-</dd><dt><tt>:default</tt></dt>
+<p><em>Hash</em>. An optional collection of keywords and their values.</p>
+<dl class="rdoc-list"><dt><tt>:default</tt></dt>
 <dd>
 <p><em>Any</em>.  Default value to assign if an instance variable is specified
-without one (<em>e.g.</em> <tt>new({}, 'varname')</tt>).</p>
+without one (<em>e.g.</em>, <tt>new('varname')</tt>).</p>
 </dd><dt><tt>:<a href="Settings.html#attribute-i-on_NameError">on_NameError</a></tt></dt>
 <dd>
 <p><em>Symbol</em>.  Action to take if an invalid instance variable name
@@ -256,46 +249,33 @@ appears in the hash.</p>
 illegal characters with ‘<tt>_</tt>’, <em>etc.</em>).</p>
 </dd></dl>
 </dd></dl>
+</dd></dl>
 
 <h3>Examples</h3>
 
 <pre>class Foo
   include PreInit
 end
-ex_1 = Foo.new(:ivar1 =&gt; 1, 'ivar2' =&gt; ['an', 'array'])
-=&gt; #&lt;Foo:0xb7551b50 @ivar2=[&quot;an&quot;, &quot;array&quot;], @ivar1=1&gt;
-
-ex_2 = Foo.new({ :op1 =&gt; 1 }, 17) { |o,*args|
-  args.each_with_index do |arg,i|
-    o.instance_variable_set(&quot;@new_ivar_#{i}&quot;.to_sym, arg)
-  end
-}
-=&gt; #&lt;Foo:0xb7547de4 @new_ivar_0=17&gt;</pre>
+ps = PreInit::Settings.new(:on_NameError =&gt; :convert)
+ex_1 = Foo.new(ps, 'i-var1' =&gt; 1, '&amp;var2' =&gt; ['an', 'array'])
+=&gt; #&lt;Foo:0xb7551b50 @_var2=[&quot;an&quot;, &quot;array&quot;], @i_var1=1&gt;</pre>
 
 <h3>Exceptions</h3>
 <dl class="rdoc-list"><dt><tt>NameError</tt></dt>
 <dd>
-<p>The name in one of the tuples could not be converted to an instance
-variable name.</p>
-</dd><dt><em>settings</em></dt>
-<dd>
-<p><em>Hash</em>.  Control settings for how the</p>
+<p>The name in one of the tuples was not a valid setting.</p>
 </dd></dl>
-
-<pre>&lt;i&gt;PreInit&lt;/i&gt; constructor should handle its
-operation when processing &lt;i&gt;*args&lt;/i&gt;.  (See
-the link:#preinit_settings section for details.)</pre>
             
 
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit/settings.rb, line 147</span>
+<span class="ruby-comment"># File lib/preinit/settings.rb, line 141</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(*<span class="ruby-identifier">args</span>)
   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">default</span> = <span class="ruby-keyword">nil</span>
   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">on_NameError</span> = <span class="ruby-value">:raise</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">arg</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
-  <span class="ruby-identifier">arg</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">v</span>) }
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
+  <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{k}=&quot;</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">v</span>) }
 <span class="ruby-keyword">end</span></pre>
             </div><!-- new-source -->
             
@@ -332,7 +312,7 @@ the link:#preinit_settings section for details.)</pre>
             
             <div class="method-source-code" id="5B-5D-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit/settings.rb, line 163</span>
+<span class="ruby-comment"># File lib/preinit/settings.rb, line 157</span>
 <span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(*<span class="ruby-identifier">args</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">send</span>(*<span class="ruby-identifier">args</span>) <span class="ruby-keyword">if</span> (<span class="ruby-constant">Names</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]))
   <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;unrecognised setting: #{args[0].inspect}&quot;</span>)
@@ -399,7 +379,7 @@ the link:#preinit_settings section for details.)</pre>
             
             <div class="method-source-code" id="on_NameError-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit/settings.rb, line 156</span>
+<span class="ruby-comment"># File lib/preinit/settings.rb, line 150</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">on_NameError=</span>(<span class="ruby-identifier">val</span>)
   <span class="ruby-keyword">unless</span> ([ <span class="ruby-value">:convert</span>, <span class="ruby-value">:ignore</span>, <span class="ruby-value">:raise</span> ].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">val</span>))
     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;unrecognised action: #{val.inspect}&quot;</span>)

@@ -28,7 +28,7 @@ require 'ruby-debug'
 Debugger.start
 
 #
-# = Enhanced constructor module
+# = Settings for the PreInit enhanced constructor module
 #
 # Author::      Ken Coar
 # Copyright::   Copyright © 2011 Ken Coar
@@ -95,61 +95,55 @@ module PreInit
     # in it according to the key/value pairs in any hashes that were passed.
     #
     # :call-seq:
-    # new<i>[(*args)]</i> => <i>object</i>
-    # new<i>[(*args)] { |obj,*args| block }</i> => <i>object</i>
+    # new<i>[(hsh)]</i> => <i>object</i>
     #
     # === Arguments
-    # [<i>*args</i>] <i>Array</i> of <i>Hash</i> (zero or more).
-    #                An optional collection of name/value pairs.
-    #                The names (keys) will be treated as names of
-    #                instance variables, and the values as their
-    #                initial contents.
-  # [<tt>:default</tt>] <i>Any</i>.  Default value to assign if an
-  #                     instance variable is specified without one
-  #                     (<i>e.g.</i> <tt>new({}, 'varname')</tt>).
-  # [<tt>:on_NameError</tt>] <i>Symbol</i>.  Action to take if an
-  #                          invalid instance variable name appears
-  #                          in the hash.
-  #                          [<tt>:raise</tt>] A <i>NameError</i> exception
-  #                                            will be raised identifying
-  #                                            the invalid name.
-  #                          [<tt>:ignore</tt>] The key/value pair with
-  #                                             the invalid name will be
-  #                                             silently ignored.
-  #                          [<tt>:convert</tt>] An attempt will be made
-  #                                              to make the name valid
-  #                                              (<i>e.g.</i>, replacing
-  #                                              illegal characters with
-  #                                              '<tt>_</tt>', <i>etc.</i>).
-  #
+    # [<i>hsh</i>] <i>Hash</i>.
+    #              An optional collection of keywords and their values.
+    #              [<tt>:default</tt>] <i>Any</i>.  Default value to assign
+    #                                  if an instance variable is specified
+    #                                  without one (<i>e.g.</i>,
+    #                                  <tt>new('varname')</tt>).
+    #              [<tt>:on_NameError</tt>] <i>Symbol</i>.  Action to take
+    #                                       if an invalid instance variable
+    #                                       name appears in the hash.
+    #                                       [<tt>:raise</tt>] A <i>NameError</i>
+    #                                                         exception
+    #                                                         will be raised
+    #                                                         identifying
+    #                                                         the invalid name.
+    #                                       [<tt>:ignore</tt>] The key/value
+    #                                                          pair with the
+    #                                                          invalid name
+    #                                                          will be silently
+    #                                                          ignored.
+    #                                       [<tt>:convert</tt>] An attempt will
+    #                                                           be made to make
+    #                                                           the name valid
+    #                                                           (<i>e.g.</i>,
+    #                                                           replacing
+    #                                                           illegal
+    #                                                           characters with
+    #                                                           '<tt>_</tt>',
+    #                                                           <i>etc.</i>).
     #
     # === Examples
     #  class Foo
     #    include PreInit
     #  end
-    #  ex_1 = Foo.new(:ivar1 => 1, 'ivar2' => ['an', 'array'])
-    #  => #<Foo:0xb7551b50 @ivar2=["an", "array"], @ivar1=1>
-    #
-    #  ex_2 = Foo.new({ :op1 => 1 }, 17) { |o,*args|
-    #    args.each_with_index do |arg,i|
-    #      o.instance_variable_set("@new_ivar_#{i}".to_sym, arg)
-    #    end
-    #  }
-    #  => #<Foo:0xb7547de4 @new_ivar_0=17>
+    #  ps = PreInit::Settings.new(:on_NameError => :convert)
+    #  ex_1 = Foo.new(ps, 'i-var1' => 1, '&var2' => ['an', 'array'])
+    #  => #<Foo:0xb7551b50 @_var2=["an", "array"], @i_var1=1>
     #
     # === Exceptions
-    # [<tt>NameError</tt>] The name in one of the tuples could not be converted
-    #                      to an instance variable name.
+    # [<tt>NameError</tt>] The name in one of the tuples was not a valid
+    #                      setting.
     #
-    # [<i>settings</i>] <i>Hash</i>.  Control settings for how the
-    #                  <i>PreInit</i> constructor should handle its
-    #                  operation when processing <i>*args</i>.  (See
-    #                  the link:#preinit_settings section for details.)
     def initialize(*args)
       self.default = nil
       self.on_NameError = :raise
-      return unless (arg[0].kind_of?(Hash))
-      arg[0].each { |k,v| self.send(k.to_sym, v) }
+      return unless (args[0].kind_of?(Hash))
+      args[0].each { |k,v| self.send("#{k}=".to_sym, v) }
     end
 
     #
@@ -165,7 +159,13 @@ module PreInit
       return self.send(*args) if (Names.include?(args[0]))
       raise ArgumentError.new("unrecognised setting: #{args[0].inspect}")
     end
-    alias_method(:[]=, :[])
+
+    def []=(setting, *args)
+       if (Names.include?(setting))
+         return self.send("#{setting.to_s}=".to_sym, *args)
+       end
+      raise ArgumentError.new("unrecognised setting: #{setting.inspect}")
+    end
 
   end
 

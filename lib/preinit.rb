@@ -72,9 +72,16 @@ Debugger.start
 # list for hashes.  For each hash it finds, it treats the keys as
 # instance variable names, and sets them to the corresponding values.
 #
-# <i><b>N.B.</b></i>: PreInit does <i>not</i> set up access methods
-# for the instance variables!  It either uses those already defined,
-# or sets the variables directly without going through an accessor method.
+# PreInit also provides a 'class' method (#import_instance_variables)
+# that it uses internally to do the hash-to-instance-variable magic --
+# but which can also be used to perform the same magic on any arbitrary
+# object even if its class doesn't mix in the PreInit module.
+#
+# <i><b>N.B.</b></i>: Mixing in PreInit does <i>not</i> set up access
+# methods for the instance variables it processes!  It either uses
+# those already defined, or sets the variables directly without going
+# through an accessor method.
+#
 module PreInit
 
   #
@@ -94,44 +101,48 @@ module PreInit
     #
     # === Description
     #
-    # Handle the turning of a set of tuples into instance variables and values.
-    # This is invoked behind the scenes by <i>new</i>, but can be invoked on
-    # an existing object in order to update or add values.
+    # Handle the turning of a set of tuples into instance variables
+    # and values.  This is invoked behind the scenes by
+    # <i>initialize</i>, but can be invoked on an existing object in
+    # order to update or add values.
     #
     # :call-seq:
     # PreInit.import_instance_variables<i>(object, *args)</i> => <i>object</i>
-    # PreInit.import_instance_variables<i>[(*args)] { |obj,*args| block }</i> => <i>object</i>
+    # PreInit.import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i>
     #
     # === Arguments
-    # [<i>*args</i>] <i>Array</i> of <i>Hash</i> (zero or more).
-    #                An optional collection of name/value pairs.
-    #                The names (keys) will be treated as names of
-    #                instance variables, and the values as their
+    # [<i>target</i>] <i>Object</i>.  The instance that will potentially
+    #                 have instance variables set from the argument list.
+    # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
+    #                <i>Hash</i> or <i>PreInit::Settings</i> objects
+    #                or any combination thereof.  <i>PreInit::Settings</i>
+    #                objects will be installed (each in turn overriding any
+    #                previously encountered) as the controls for the
+    #                constructor.
+    #                The names (keys) of Hash elements will be treated
+    #                as names of instance variables, and the values as their
     #                initial contents.
     #
     # === Examples
-    #  class Foo
-    #    include PreInit
-    #  end
-    #  ex_1 = Foo.new
-    #  ex_1.load_attrs(:ivar1 => 1, 'ivar2' => ['an', 'array'])
-    #  => #<Foo:0xb7551b50 @ivar2=["an", "array"], @ivar1=1>
-    #
-    #  ex_2 = Foo.new
-    #  ex_2.load_attrs(17) { |o,*args|
-    #    args.each_with_index do |arg,i|
-    #      o.instance_variable_set("@new_ivar_#{i}".to_sym, arg)
-    #    end
-    #  }
-    #  => #<Foo:0xb7547de4 @new_ivar_0=17>
+    #  ex_1 = Object.new
+    #  PreInit.import_instance_variables(:ivar_1 => 'New string', :zed => :zed)
+    #  => #<Object:0xb7403780 @zed=:zed, @ivar_1="New string">
     #
     # === Exceptions
-    # [<tt>NameError</tt>] The name in one of the tuples could not be converted
-    #                      to an instance variable name.
+    # [<tt>NameError</tt>] The name in one of the tuples is not a valid
+    #                      instance variable name.
     #
     def import_instance_variables(target, *args)
+      if (target.instance_variable_get(:@preinit_settings).nil?)
+        target.instance_variable_set(:@preinit_settings, Settings.new)
+      end
       while (arg = args.shift)
+        if (arg.kind_of?(PreInit::Settings))
+          target.instance_variable_set(:@preinit_settings, arg)
+          next
+        end
         next unless (block_given? || arg.kind_of?(Hash))
+        settings = target.instance_variable_get(:@preinit_settings)
         arg.each do |*segs|
           if (block_given?)
             yield(target, *segs)
@@ -145,7 +156,7 @@ module PreInit
           #
           ivar = ivar.to_s.dup
           if (ivar !~ %r!^[_a-z0-9]+$!i)
-            case target.preinit_settings.on_NameError
+            case settings.on_NameError
             when :ignore
               next
             when :convert
@@ -174,7 +185,7 @@ module PreInit
   end
 
   #
-  # Hash of controls affecting how the constructor functions.
+  # Controls affecting how the constructor functions.
   #
   attr_reader(:preinit_settings)
 
@@ -189,10 +200,14 @@ module PreInit
   # new<i>[(*args)] { |obj,*args| block }</i> => <i>object</i>
   #
   # === Arguments
-  # [<i>*args</i>] <i>Array</i> of <i>Hash</i> (zero or more).
-  #                An optional collection of name/value pairs.
-  #                The names (keys) will be treated as names of
-  #                instance variables, and the values as their
+  # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
+  #                <i>Hash</i> or <i>PreInit::Settings</i> objects
+  #                or any combination thereof.  <i>PreInit::Settings</i>
+  #                objects will be installed (each in turn overriding any
+  #                previously encountered) as the controls for the
+  #                constructor.
+  #                The names (keys) of Hash elements will be treated
+  #                as names of instance variables, and the values as their
   #                initial contents.
   #
   # === Examples
@@ -210,8 +225,9 @@ module PreInit
   #  => #<Foo:0xb7547de4 @new_ivar_0=17>
   #
   # === Exceptions
-  # [<tt>NameError</tt>] The name in one of the tuples could not be converted
-  #                      to an instance variable name.
+  # [<tt>NameError</tt>] (<i>Raised from PreInit.import_instance_variables</i>)
+  #                      The name in one of the tuples is not a valid
+  #                      instance variable name.
   #
   def initialize(*args, &block)
     @preinit_settings = Settings.new(:on_NameError => :raise)

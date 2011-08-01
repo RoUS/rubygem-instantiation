@@ -70,7 +70,7 @@
         <h3 class="section-header">Methods</h3>
         <ul class="link-list">
           
-          <li><a href="#method-c-load_instance_variables">::load_instance_variables</a></li>
+          <li><a href="#method-c-import_instance_variables">::import_instance_variables</a></li>
           
           <li><a href="#method-c-new">::new</a></li>
           
@@ -132,7 +132,7 @@
 
     <div id="description" class="description">
       
-<h1>Enhanced constructor module</h1>
+<h1><a href="PreInit/Settings.html">Settings</a> for the <a href="PreInit.html">PreInit</a> enhanced constructor module</h1>
 <table class="rdoc-list"><tr><td class="rdoc-term"><p>Author</p></td>
 <td>
 <p>Ken Coar</p>
@@ -214,10 +214,16 @@ href="PreInit.html">PreInit</a> scans its argument list for hashes.  For
 each hash it finds, it treats the keys as instance variable names, and sets
 them to the corresponding values.</p>
 
-<p><b><em>N.B.</em></b>: <a href="PreInit.html">PreInit</a> does <em>not</em>
-set up access methods for the instance variables!  It either uses those
-already defined, or sets the variables directly without going through an
-accessor method.</p>
+<p><a href="PreInit.html">PreInit</a> also provides a ‘class’ method
+(#import_instance_variables) that it uses internally to do the
+hash-to-instance-variable magic – but which can also be used to perform
+the same magic on any arbitrary object even if its class doesn’t mix in
+the <a href="PreInit.html">PreInit</a> module.</p>
+
+<p><b><em>N.B.</em></b>: Mixing in <a href="PreInit.html">PreInit</a> does
+<em>not</em> set up access methods for the instance variables it processes!
+It either uses those already defined, or sets the variables directly
+without going through an accessor method.</p>
 
     </div><!-- description -->
 
@@ -264,7 +270,7 @@ object.</p></dd>
 
           <div class="method-description">
           
-          <p>Hash of controls affecting how the constructor functions.</p>
+          <p>Controls affecting how the constructor functions.</p>
           
           </div>
         </div>
@@ -278,20 +284,20 @@ object.</p></dd>
         <h3 class="section-header">Public Class Methods</h3>
 
       
-        <div id="load_instance_variables-method" class="method-detail ">
-          <a name="method-c-load_instance_variables"></a>
+        <div id="import_instance_variables-method" class="method-detail ">
+          <a name="method-c-import_instance_variables"></a>
 
           
           
           <div class="method-heading">
-            <span class="method-callseq">load_instance_variables<i>(object, *args)</i> => <i>object</i></span>
+            <span class="method-callseq">import_instance_variables<i>(object, *args)</i> => <i>object</i></span>
             
             <span class="method-click-advice">click to toggle source</span>
             
           </div>
           
           <div class="method-heading">
-            <span class="method-callseq">load_instance_variables<i>[(*args)] { |obj,*args| block }</i> => <i>object</i></span>
+            <span class="method-callseq">import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i></span>
             
           </div>
           
@@ -301,50 +307,55 @@ object.</p></dd>
             
             <h3>Description</h3>
 
-<p>Handle the turning of a set of tuples into instance variables and values.
-This is invoked behind the scenes by <em>new</em>, but can be invoked on an
-existing object in order to update or add values.</p>
+<p>Handle the turning of a set of tuples into instance variables and values. 
+This is invoked behind the scenes by <em>initialize</em>, but can be
+invoked on an existing object in order to update or add values.</p>
 
 <h3>Arguments</h3>
-<dl class="rdoc-list"><dt><em>*args</em></dt>
+<dl class="rdoc-list"><dt><em>target</em></dt>
 <dd>
-<p><em>Array</em> of <em>Hash</em> (zero or more). An optional collection of
-name/value pairs. The names (keys) will be treated as names of instance
-variables, and the values as their initial contents.</p>
+<p><em>Object</em>.  The instance that will potentially have instance
+variables set from the argument list.</p>
+</dd><dt><em>*args</em></dt>
+<dd>
+<p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or <em><a
+href="PreInit/Settings.html">PreInit::Settings</a></em> objects or any
+combination thereof.  <em><a
+href="PreInit/Settings.html">PreInit::Settings</a></em> objects will be
+installed (each in turn overriding any previously encountered) as the
+controls for the constructor. The names (keys) of Hash elements will be
+treated as names of instance variables, and the values as their initial
+contents.</p>
 </dd></dl>
 
 <h3>Examples</h3>
 
-<pre>class Foo
-  include PreInit
-end
-ex_1 = Foo.new
-ex_1.load_attrs(:ivar1 =&gt; 1, 'ivar2' =&gt; ['an', 'array'])
-=&gt; #&lt;Foo:0xb7551b50 @ivar2=[&quot;an&quot;, &quot;array&quot;], @ivar1=1&gt;
-
-ex_2 = Foo.new
-ex_2.load_attrs(17) { |o,*args|
-  args.each_with_index do |arg,i|
-    o.instance_variable_set(&quot;@new_ivar_#{i}&quot;.to_sym, arg)
-  end
-}
-=&gt; #&lt;Foo:0xb7547de4 @new_ivar_0=17&gt;</pre>
+<pre>ex_1 = Object.new
+PreInit.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
+=&gt; #&lt;Object:0xb7403780 @zed=:zed, @ivar_1=&quot;New string&quot;&gt;</pre>
 
 <h3>Exceptions</h3>
 <dl class="rdoc-list"><dt><tt>NameError</tt></dt>
 <dd>
-<p>The name in one of the tuples could not be converted to an instance
-variable name.</p>
+<p>The name in one of the tuples is not a valid instance variable name.</p>
 </dd></dl>
             
 
             
-            <div class="method-source-code" id="load_instance_variables-source">
+            <div class="method-source-code" id="import_instance_variables-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit.rb, line 131</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">load_instance_variables</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">args</span>)
+<span class="ruby-comment"># File lib/preinit.rb, line 134</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">args</span>)
+  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>).<span class="ruby-identifier">nil?</span>)
+    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>)
+  <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">while</span> (<span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>)
+    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">PreInit</span><span class="ruby-operator">::</span><span class="ruby-constant">Settings</span>))
+      <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-identifier">arg</span>)
+      <span class="ruby-keyword">next</span>
+    <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
+    <span class="ruby-identifier">settings</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>)
     <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>*<span class="ruby-identifier">segs</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span>)
         <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">segs</span>)
@@ -358,7 +369,7 @@ variable name.</p>
       <span class="ruby-comment">#</span>
       <span class="ruby-identifier">ivar</span> = <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>
       <span class="ruby-keyword">if</span> (<span class="ruby-identifier">ivar</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp">%^[_a-z0-9]+$!</span>)
-        <span class="ruby-keyword">case</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">preinit_settings</span>.<span class="ruby-identifier">on_NameError</span>
+        <span class="ruby-keyword">case</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">on_NameError</span>
         <span class="ruby-keyword">when</span> <span class="ruby-value">:ignore</span>
           <span class="ruby-keyword">next</span>
         <span class="ruby-keyword">when</span> <span class="ruby-value">:convert</span>
@@ -383,14 +394,14 @@ variable name.</p>
   <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">target</span>
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- load_instance_variables-source -->
+            </div><!-- import_instance_variables-source -->
             
           </div>
 
           
 
           
-        </div><!-- load_instance_variables-method -->
+        </div><!-- import_instance_variables-method -->
 
       
         <div id="new-method" class="method-detail ">
@@ -422,9 +433,14 @@ it according to the key/value pairs in any hashes that were passed.</p>
 <h3>Arguments</h3>
 <dl class="rdoc-list"><dt><em>*args</em></dt>
 <dd>
-<p><em>Array</em> of <em>Hash</em> (zero or more). An optional collection of
-name/value pairs. The names (keys) will be treated as names of instance
-variables, and the values as their initial contents.</p>
+<p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or <em><a
+href="PreInit/Settings.html">PreInit::Settings</a></em> objects or any
+combination thereof.  <em><a
+href="PreInit/Settings.html">PreInit::Settings</a></em> objects will be
+installed (each in turn overriding any previously encountered) as the
+controls for the constructor. The names (keys) of Hash elements will be
+treated as names of instance variables, and the values as their initial
+contents.</p>
 </dd></dl>
 
 <h3>Examples</h3>
@@ -445,19 +461,20 @@ ex_2 = Foo.new({ :op1 =&gt; 1 }, 17) { |o,*args|
 <h3>Exceptions</h3>
 <dl class="rdoc-list"><dt><tt>NameError</tt></dt>
 <dd>
-<p>The name in one of the tuples could not be converted to an instance
-variable name.</p>
+<p>(<em>Raised from <a
+href="PreInit.html#method-c-import_instance_variables">PreInit.import_instance_variables</a></em>)
+The name in one of the tuples is not a valid instance variable name.</p>
 </dd></dl>
             
 
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit.rb, line 215</span>
+<span class="ruby-comment"># File lib/preinit.rb, line 231</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-ivar">@preinit_settings</span> = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:on_NameError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:raise</span>)
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>))
-    <span class="ruby-constant">PreInit</span>.<span class="ruby-identifier">load_instance_variables</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
+    <span class="ruby-constant">PreInit</span>.<span class="ruby-identifier">import_instance_variables</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
             </div><!-- new-source -->
