@@ -1,5 +1,0 @@
-o Rather than an instance variable, add an instance method
-  'preinit_on_NameError=' (etc.) that instance-evals a reader
-  hard-coded to return the appropriate value.
-o Add an accessor-like declarator that sets the default settings for
-  the class.
