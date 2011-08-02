@@ -187,7 +187,7 @@ module PreInit
   #
   def initialize(*args, &block)
     if (block_given? || (! args.empty?))
-      PreInit.import_instance_variables(*args, &block)
+      PreInit.import_instance_variables(self, *args, &block)
     end
   end
 

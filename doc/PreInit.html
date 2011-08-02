@@ -34,9 +34,6 @@
         <div class="section-body">
           <ul>
           
-            <li><a href="./lib/preinit/settings_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
-              class="thickbox" title="lib/preinit/settings.rb">lib/preinit/settings.rb</a></li>
-          
             <li><a href="./lib/preinit_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
               class="thickbox" title="lib/preinit.rb">lib/preinit.rb</a></li>
           
@@ -52,16 +49,6 @@
 
       
 
-      
-      <!-- Namespace Contents -->
-      <div id="namespace-list-section" class="section">
-        <h3 class="section-header">Namespace</h3>
-        <ul class="link-list">
-          
-          <li><span class="type">CLASS</span> <a href="PreInit/Settings.html">PreInit::Settings</a></li>
-          
-        </ul>
-      </div>
       
 
       
@@ -117,8 +104,6 @@
         
           <li><a href="./PreInit.html">PreInit</a></li>
         
-          <li><a href="./PreInit/Settings.html">PreInit::Settings</a></li>
-        
         </ul>
         <div id="no-class-search-results" style="display: none;">No matching classes.</div>
       </div>
@@ -132,50 +117,6 @@
 
     <div id="description" class="description">
       
-<h1><a href="PreInit/Settings.html">Settings</a> for the <a href="PreInit.html">PreInit</a> enhanced constructor module</h1>
-<table class="rdoc-list"><tr><td class="rdoc-term"><p>Author</p></td>
-<td>
-<p>Ken Coar</p>
-</td></tr><tr><td class="rdoc-term"><p>Copyright</p></td>
-<td>
-<p>Copyright © 2011 Ken Coar</p>
-</td></tr><tr><td class="rdoc-term"><p>License</p></td>
-<td>
-<p>Apache Licence 2.0</p>
-</td></tr></table>
-
-<h2>Synopsis</h2>
-
-<pre>require 'rubygems'
-require 'preinit'
-
-class Foo
-  include PreInit
-    :
-  attr_accessor(:ivar1)
-  def initialize(*args)
-    super
-      :
-  end
-end
-
-obj = Foo.new(:ivar1 =&gt; 'val1')
-obj.ivar1
-=&gt; &quot;val1&quot;</pre>
-
-<h2>Description</h2>
-
-<p>The <em>initialize</em> method provided by <a
-href="PreInit.html">PreInit</a> scans its argument list for hashes.  For
-each hash it finds, it treats the keys as instance variable names, and sets
-them to the corresponding values.</p>
-
-<p><b><em>N.B.</em></b>: <a href="PreInit.html">PreInit</a> does <em>not</em>
-set up access methods for the instance variables!  It either uses those
-already defined, or sets the variables directly without going through an
-accessor method.</p>
-<hr style="height: 1px">
-
 <h1>Enhanced constructor module</h1>
 <table class="rdoc-list"><tr><td class="rdoc-term"><p>Author</p></td>
 <td>
@@ -255,28 +196,6 @@ object.</p></dd>
       
 
       
-      <!-- Attributes -->
-      <div id="attribute-method-details" class="method-section section">
-        <h3 class="section-header">Attributes</h3>
-
-        
-        <div id="preinit_settings-attribute-method" class="method-detail">
-          <a name="preinit_settings"></a>
-          
-          <div class="method-heading attribute-method-heading">
-            <span class="method-name">preinit_settings</span><span
-              class="attribute-access-type">[R]</span>
-          </div>
-
-          <div class="method-description">
-          
-          <p>Controls affecting how the constructor functions.</p>
-          
-          </div>
-        </div>
-        
-      </div><!-- attribute-method-details -->
-      
 
       <!-- Methods -->
       
@@ -318,12 +237,7 @@ invoked on an existing object in order to update or add values.</p>
 variables set from the argument list.</p>
 </dd><dt><em>*args</em></dt>
 <dd>
-<p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or <em><a
-href="PreInit/Settings.html">PreInit::Settings</a></em> objects or any
-combination thereof.  <em><a
-href="PreInit/Settings.html">PreInit::Settings</a></em> objects will be
-installed (each in turn overriding any previously encountered) as the
-controls for the constructor. The names (keys) of Hash elements will be
+<p><em>Array</em> of <em>Hash</em>. The names (keys) of Hash elements will be
 treated as names of instance variables, and the values as their initial
 contents.</p>
 </dd></dl>
@@ -344,18 +258,10 @@ PreInit.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
             
             <div class="method-source-code" id="import_instance_variables-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit.rb, line 134</span>
+<span class="ruby-comment"># File lib/preinit.rb, line 116</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>).<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>)
-  <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">while</span> (<span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>)
-    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">PreInit</span><span class="ruby-operator">::</span><span class="ruby-constant">Settings</span>))
-      <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-identifier">arg</span>)
-      <span class="ruby-keyword">next</span>
-    <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
-    <span class="ruby-identifier">settings</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>)
     <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>*<span class="ruby-identifier">segs</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span>)
         <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">segs</span>)
@@ -369,15 +275,7 @@ PreInit.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
       <span class="ruby-comment">#</span>
       <span class="ruby-identifier">ivar</span> = <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>
       <span class="ruby-keyword">if</span> (<span class="ruby-identifier">ivar</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp">%^[_a-z0-9]+$!</span>)
-        <span class="ruby-keyword">case</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">on_NameError</span>
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:ignore</span>
-          <span class="ruby-keyword">next</span>
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:convert</span>
-          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%[^_a-z0-9]!</span>, <span class="ruby-string">'_'</span>)
-          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%_{2,}!</span>, <span class="ruby-string">'_'</span>)
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:raise</span>
-          <span class="ruby-identifier">raise</span> <span class="ruby-constant">NameError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Illegal instance variable name: '#{ivar}'&quot;</span>)
-        <span class="ruby-keyword">end</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">NameError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Illegal instance variable name: '#{ivar}'&quot;</span>)
       <span class="ruby-keyword">end</span>
       <span class="ruby-identifier">setmeth</span> = <span class="ruby-node">&quot;#{ivar}=&quot;</span>.<span class="ruby-identifier">to_sym</span>
       <span class="ruby-comment">#</span>
@@ -433,12 +331,7 @@ it according to the key/value pairs in any hashes that were passed.</p>
 <h3>Arguments</h3>
 <dl class="rdoc-list"><dt><em>*args</em></dt>
 <dd>
-<p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or <em><a
-href="PreInit/Settings.html">PreInit::Settings</a></em> objects or any
-combination thereof.  <em><a
-href="PreInit/Settings.html">PreInit::Settings</a></em> objects will be
-installed (each in turn overriding any previously encountered) as the
-controls for the constructor. The names (keys) of Hash elements will be
+<p><em>Array</em> of <em>Hash</em>. The names (keys) of Hash elements will be
 treated as names of instance variables, and the values as their initial
 contents.</p>
 </dd></dl>
@@ -451,7 +344,7 @@ end
 ex_1 = Foo.new(:ivar1 =&gt; 1, 'ivar2' =&gt; ['an', 'array'])
 =&gt; #&lt;Foo:0xb7551b50 @ivar2=[&quot;an&quot;, &quot;array&quot;], @ivar1=1&gt;
 
-ex_2 = Foo.new({ :op1 =&gt; 1 }, 17) { |o,*args|
+ex_2 = Foo.new(17) { |o,*args|
   args.each_with_index do |arg,i|
     o.instance_variable_set(&quot;@new_ivar_#{i}&quot;.to_sym, arg)
   end
@@ -470,11 +363,10 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit.rb, line 231</span>
+<span class="ruby-comment"># File lib/preinit.rb, line 187</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
-  <span class="ruby-ivar">@preinit_settings</span> = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:on_NameError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:raise</span>)
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>))
-    <span class="ruby-constant">PreInit</span>.<span class="ruby-identifier">import_instance_variables</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
+    <span class="ruby-constant">PreInit</span>.<span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
             </div><!-- new-source -->

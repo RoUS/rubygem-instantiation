@@ -76,6 +76,7 @@ class TestPreInit < Test::Unit::TestCase
     ihash = @testdata_hash_symbolic_keys
     o_test = TestClass.new
     result = PreInit.import_instance_variables(o_test, ihash)
+    assert_same(o_test, result)
     assert(result.kind_of?(TestClass))
     assert_same(o_test, result)
     ihash.each do |ivar,ival|
