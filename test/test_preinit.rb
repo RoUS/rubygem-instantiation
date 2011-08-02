@@ -4,6 +4,7 @@ require 'pp'
 class TestPreInit < Test::Unit::TestCase
 
   def setup
+    @psettings = PreInit::Settings.new
     @testdata_hash_symbolic_keys = {
       :ivar1	=> 1,
       :ivar_1	=> '1',
@@ -65,19 +66,21 @@ class TestPreInit < Test::Unit::TestCase
     end
   end
 
-  def test_005_simple_hash_bogus_keys
+  def test_005_simple_hash_bogus_keys_raise
     ihash = @testdata_hash_bogus_keys
+    @psettings.on_NameError = :raise
+    o_test = TestClass.new(@psettings)
     assert_raise(NameError) do
-      o_test = TestClass.new(ihash)
+      PreInit.import_instance_variables(o_test, ihash)
     end
   end
 
-  def test_006_simple_hash_bogus_keys
+  def test_006_simple_hash_bogus_keys_ignore
     ihash = @testdata_hash_bogus_keys
-    o_test = TestClass.new
-    o_test.preinit_options[:on_NameError] = :ignore
+    @psettings.on_NameError = :ignore
+    o_test = TestClass.new(@psettings)
     assert_nothing_raised() do
-      o_test.load_attrs(ihash)
+      PreInit.import_instance_variables(o_test, ihash)
     end
     ihash.each do |ivar,ival|
       ivar_sym = "@#{ivar.to_s}".to_sym
@@ -91,7 +94,7 @@ class TestPreInit < Test::Unit::TestCase
     end
   end
 
-  def test_007_simple_hash_bogus_keys
+  def test_007_simple_hash_bogus_keys_convert
     ihash = @testdata_hash_bogus_keys
     o_test = TestClass.new
     o_test.preinit_options[:on_NameError] = :convert
