@@ -322,22 +322,18 @@ ex_1 = Foo.new(ps, 'i-var1' =&gt; 1, '&amp;var2' =&gt; ['an', 'array'])
           </div>
 
           
-          <div class="aliases">
-            Also aliased as: <a href="Settings.html#method-i-5B-5D-3D">[]=</a>
-          </div>
-          
 
           
         </div><!-- 5B-5D-method -->
 
       
-        <div id="5B-5D-3D-method" class="method-detail method-alias">
+        <div id="5B-5D-3D-method" class="method-detail ">
           <a name="method-i-5B-5D-3D"></a>
 
           
           <div class="method-heading">
             <span class="method-name">[]=</span><span
-              class="method-args">(*args)</span>
+              class="method-args">(setting, *args)</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
           
@@ -348,14 +344,21 @@ ex_1 = Foo.new(ps, 'i-var1' =&gt; 1, '&amp;var2' =&gt; ['an', 'array'])
             
 
             
+            <div class="method-source-code" id="5B-5D-3D-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit/settings.rb, line 162</span>
+<span class="ruby-keyword">def</span> <span class="ruby-operator">[]=</span>(<span class="ruby-identifier">setting</span>, *<span class="ruby-identifier">args</span>)
+   <span class="ruby-keyword">if</span> (<span class="ruby-constant">Names</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">setting</span>))
+     <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{setting.to_s}=&quot;</span>.<span class="ruby-identifier">to_sym</span>, *<span class="ruby-identifier">args</span>)
+   <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;unrecognised setting: #{setting.inspect}&quot;</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- 5B-5D-3D-source -->
+            
           </div>
 
           
 
-          
-          <div class="aliases">
-            Alias for: <a href="Settings.html#method-i-5B-5D">[]</a>
-          </div>
           
         </div><!-- 5B-5D-3D-method -->
 

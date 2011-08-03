@@ -74,6 +74,16 @@
           
           <li><a href="#method-c-new">::new</a></li>
           
+          <li><a href="#method-c-set_NameError_action">::set_NameError_action</a></li>
+          
+          <li><a href="#method-i-preinit_on_NameError">#preinit_on_NameError</a></li>
+          
+          <li><a href="#method-i-preinit_on_NameError-3D">#preinit_on_NameError=</a></li>
+          
+          <li><a href="#method-i-preinit_use_accessors">#preinit_use_accessors</a></li>
+          
+          <li><a href="#method-i-preinit_use_accessors-3D">#preinit_use_accessors=</a></li>
+          
         </ul>
       </div>
       
@@ -345,18 +355,14 @@ PreInit.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
             <div class="method-source-code" id="import_instance_variables-source">
 <pre>
 <span class="ruby-comment"># File lib/preinit.rb, line 134</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>).<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>)
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">tuples</span>, <span class="ruby-identifier">options</span>={})
+  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:preinit_on_NameError=</span>))
+    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreInit</span>)
   <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">while</span> (<span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>)
-    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">PreInit</span><span class="ruby-operator">::</span><span class="ruby-constant">Settings</span>))
-      <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@preinit_settings</span>, <span class="ruby-identifier">arg</span>)
-      <span class="ruby-keyword">next</span>
-    <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
-    <span class="ruby-identifier">settings</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@preinit_settings</span>)
-    <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>*<span class="ruby-identifier">segs</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">preinit_on_NameError</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:on_NameError</span>]
+  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">preinit_use_accessors</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:use_accessors</span>]
+  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">tuples</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>))
+    <span class="ruby-identifier">tuples</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>*<span class="ruby-identifier">segs</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span>)
         <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">target</span>, *<span class="ruby-identifier">segs</span>)
         <span class="ruby-keyword">next</span>
@@ -367,28 +373,36 @@ PreInit.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
       <span class="ruby-comment"># valid method name (like 'foo-bar' =&gt; 'val').  What to do with</span>
       <span class="ruby-comment"># such?</span>
       <span class="ruby-comment">#</span>
-      <span class="ruby-identifier">ivar</span> = <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>
-      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">ivar</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp">%^[_a-z0-9]+$!</span>)
-        <span class="ruby-keyword">case</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">on_NameError</span>
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:ignore</span>
-          <span class="ruby-keyword">next</span>
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:convert</span>
-          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%[^_a-z0-9]!</span>, <span class="ruby-string">'_'</span>)
-          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%_{2,}!</span>, <span class="ruby-string">'_'</span>)
-        <span class="ruby-keyword">when</span> <span class="ruby-value">:raise</span>
-          <span class="ruby-identifier">raise</span> <span class="ruby-constant">NameError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Illegal instance variable name: '#{ivar}'&quot;</span>)
+      <span class="ruby-identifier">retried</span> = <span class="ruby-keyword">false</span>
+      <span class="ruby-identifier">action</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">preinit_on_NameError</span>
+      <span class="ruby-keyword">begin</span>
+        <span class="ruby-identifier">ivar</span> = <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>
+        <span class="ruby-identifier">ivar_setmeth</span> = <span class="ruby-node">&quot;#{ivar}=&quot;</span>.<span class="ruby-identifier">to_sym</span>
+        <span class="ruby-comment">#</span>
+        <span class="ruby-comment"># If there's already a 'foo=' method, potentially use it</span>
+        <span class="ruby-comment"># rather than just setting the instance variable directly</span>
+        <span class="ruby-comment"># -- thus preserving any special processing the class has</span>
+        <span class="ruby-comment"># for the variable.</span>
+        <span class="ruby-comment">#</span>
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">preinit_use_accessors</span>                  <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">ivar_setmeth</span>))
+          <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">ivar_setmeth</span>, <span class="ruby-identifier">ival</span>)
+        <span class="ruby-keyword">else</span>
+          <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{ivar}&quot;</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">ival</span>)
         <span class="ruby-keyword">end</span>
-      <span class="ruby-keyword">end</span>
-      <span class="ruby-identifier">setmeth</span> = <span class="ruby-node">&quot;#{ivar}=&quot;</span>.<span class="ruby-identifier">to_sym</span>
-      <span class="ruby-comment">#</span>
-      <span class="ruby-comment"># If there's already a 'foo=' method, use it rather than</span>
-      <span class="ruby-comment"># just setting the instance variable directly -- thus preserving</span>
-      <span class="ruby-comment"># any special processing the class has for the variable.</span>
-      <span class="ruby-comment">#</span>
-      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">setmeth</span>))
-        <span class="ruby-identifier">target</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">setmeth</span>, <span class="ruby-identifier">ival</span>)
-      <span class="ruby-keyword">else</span>
-        <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{ivar}&quot;</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">ival</span>)
+      <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NameError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ignore</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-keyword">if</span> ((<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:raise</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">retried</span>)
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:convert</span>)
+          <span class="ruby-identifier">retried</span> = <span class="ruby-keyword">true</span>
+          <span class="ruby-comment">#</span>
+          <span class="ruby-comment"># Turn bogus characters (sequences of one or more) into single</span>
+          <span class="ruby-comment"># '_' characters.  We only do this once; if we still get an</span>
+          <span class="ruby-comment"># exception, tough noogies.</span>
+          <span class="ruby-comment">#</span>
+          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%[^_A-Z0-9]+!</span>, <span class="ruby-string">'_'</span>)
+          <span class="ruby-identifier">ivar</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">%_{2,}!</span>, <span class="ruby-string">'_'</span>)
+          <span class="ruby-keyword">retry</span>
+        <span class="ruby-keyword">end</span>
       <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
@@ -470,7 +484,7 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/preinit.rb, line 231</span>
+<span class="ruby-comment"># File lib/preinit.rb, line 273</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-ivar">@preinit_settings</span> = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:on_NameError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:raise</span>)
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>))
@@ -487,7 +501,187 @@ The name in one of the tuples is not a valid instance variable name.</p>
         </div><!-- new-method -->
 
       
+        <div id="set_NameError_action-method" class="method-detail ">
+          <a name="method-c-set_NameError_action"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">set_NameError_action</span><span
+              class="method-args">(target, action)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="set_NameError_action-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 189</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">action</span>)
+  <span class="ruby-identifier">action</span> <span class="ruby-operator">||=</span> <span class="ruby-value">:raise</span>
+  <span class="ruby-keyword">unless</span> ([ <span class="ruby-value">:raise</span>, <span class="ruby-value">:ignore</span>, <span class="ruby-value">:convert</span> ].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">action</span>))
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;invalid action '#{action.inspect}'&quot;</span>)
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">code</span> = <span class="ruby-string">        def preinit_on_NameError          return #{action.inspect}        end</span>
+  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-identifier">code</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">action</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- set_NameError_action-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- set_NameError_action-method -->
+
+      
       </div><!-- public-class-method-details -->
+    
+      <div id="public-instance-method-details" class="method-section section">
+        <h3 class="section-header">Public Instance Methods</h3>
+
+      
+        <div id="preinit_on_NameError-method" class="method-detail ">
+          <a name="method-i-preinit_on_NameError"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">preinit_on_NameError</span><span
+              class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="preinit_on_NameError-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 210</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">preinit_on_NameError</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-value">:raise</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- preinit_on_NameError-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- preinit_on_NameError-method -->
+
+      
+        <div id="preinit_on_NameError-3D-method" class="method-detail ">
+          <a name="method-i-preinit_on_NameError-3D"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">preinit_on_NameError=</span><span
+              class="method-args">(action)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="preinit_on_NameError-3D-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 205</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">preinit_on_NameError=</span>(<span class="ruby-identifier">action</span>)
+  <span class="ruby-constant">PreInit</span>.<span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">action</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">preinit_on_NameError</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- preinit_on_NameError-3D-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- preinit_on_NameError-3D-method -->
+
+      
+        <div id="preinit_use_accessors-method" class="method-detail ">
+          <a name="method-i-preinit_use_accessors"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">preinit_use_accessors</span><span
+              class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="preinit_use_accessors-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 224</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">preinit_use_accessors</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- preinit_use_accessors-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- preinit_use_accessors-method -->
+
+      
+        <div id="preinit_use_accessors-3D-method" class="method-detail ">
+          <a name="method-i-preinit_use_accessors-3D"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">preinit_use_accessors=</span><span
+              class="method-args">(bool)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="preinit_use_accessors-3D-source">
+<pre>
+<span class="ruby-comment"># File lib/preinit.rb, line 214</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">preinit_use_accessors=</span>(<span class="ruby-identifier">bool</span>)
+  <span class="ruby-identifier">code</span> = <span class="ruby-string">      def use_accessors        return #{bool ? 'true' : 'false'}      end</span>
+  <span class="ruby-identifier">instance_eval</span>(<span class="ruby-identifier">code</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">preinit_use_accessors</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- preinit_use_accessors-3D-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- preinit_use_accessors-3D-method -->
+
+      
+      </div><!-- public-instance-method-details -->
     
     </div><!-- 5Buntitled-5D -->
   
