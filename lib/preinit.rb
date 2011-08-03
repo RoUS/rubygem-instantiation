@@ -31,12 +31,12 @@ end
 
 # :startdoc:
 
-require 'rubygems'
 require 'versionomy'
 
 require 'preinit/settings'
 
 require 'pp'
+
 require 'ruby-debug'
 Debugger.start
 
@@ -132,18 +132,14 @@ module PreInit
     # [<tt>NameError</tt>] The name in one of the tuples is not a valid
     #                      instance variable name.
     #
-    def import_instance_variables(target, *args)
-      if (target.instance_variable_get(:@preinit_settings).nil?)
-        target.instance_variable_set(:@preinit_settings, Settings.new)
+    def import_instance_variables(target, tuples, options={})
+      unless (target.respond_to?(:preinit_on_NameError=))
+        target.extend(PreInit)
       end
-      while (arg = args.shift)
-        if (arg.kind_of?(PreInit::Settings))
-          target.instance_variable_set(:@preinit_settings, arg)
-          next
-        end
-        next unless (block_given? || arg.kind_of?(Hash))
-        settings = target.instance_variable_get(:@preinit_settings)
-        arg.each do |*segs|
+      target.preinit_on_NameError = options[:on_NameError]
+      target.preinit_use_accessors = options[:use_accessors]
+      if (block_given? || tuples.kind_of?(Hash))
+        tuples.each do |*segs|
           if (block_given?)
             yield(target, *segs)
             next
@@ -154,34 +150,80 @@ module PreInit
           # valid method name (like 'foo-bar' => 'val').  What to do with
           # such?
           #
-          ivar = ivar.to_s.dup
-          if (ivar !~ %r!^[_a-z0-9]+$!i)
-            case settings.on_NameError
-            when :ignore
-              next
-            when :convert
-              ivar.gsub!(%r![^_a-z0-9]!i, '_')
-              ivar.gsub!(%r!_{2,}!, '_')
-            when :raise
-              raise NameError.new("Illegal instance variable name: '#{ivar}'")
+          retried = false
+          action = target.preinit_on_NameError
+          begin
+            ivar = ivar.to_s.dup
+            ivar_setmeth = "#{ivar}=".to_sym
+            #
+            # If there's already a 'foo=' method, potentially use it
+            # rather than just setting the instance variable directly
+            # -- thus preserving any special processing the class has
+            # for the variable.
+            #
+            if (target.preinit_use_accessors \
+                && target.respond_to?(ivar_setmeth))
+              target.__send__(ivar_setmeth, ival)
+            else
+              target.instance_variable_set("@#{ivar}".to_sym, ival)
             end
-          end
-          setmeth = "#{ivar}=".to_sym
-          #
-          # If there's already a 'foo=' method, use it rather than
-          # just setting the instance variable directly -- thus preserving
-          # any special processing the class has for the variable.
-          #
-          if (target.respond_to?(setmeth))
-            target.send(setmeth, ival)
-          else
-            target.instance_variable_set("@#{ivar}".to_sym, ival)
+          rescue NameError => e
+            next if (action == :ignore)
+            raise if ((action == :raise) || retried)
+            if (action == :convert)
+              retried = true
+              #
+              # Turn bogus characters (sequences of one or more) into single
+              # '_' characters.  We only do this once; if we still get an
+              # exception, tough noogies.
+              #
+              ivar.gsub!(%r![^_A-Z0-9]+!i, '_')
+              ivar.gsub!(%r!_{2,}!, '_')
+              retry
+            end
           end
         end
       end
       return target
     end
 
+    def set_NameError_action(target, action)
+      action ||= :raise
+      unless ([ :raise, :ignore, :convert ].include?(action))
+        raise ArgumentError.new("invalid action '#{action.inspect}'")
+      end
+      code = <<-EOC
+        def preinit_on_NameError
+          return #{action.inspect}
+        end
+      EOC
+      target.instance_eval(code)
+      return action
+    end
+
+  end
+
+  def preinit_on_NameError=(action)
+    PreInit.set_NameError_action(self, action)
+    return self.preinit_on_NameError
+  end
+
+  def preinit_on_NameError
+    return :raise
+  end
+
+  def preinit_use_accessors=(bool)
+    code = <<-EOC
+      def use_accessors
+        return #{bool ? 'true' : 'false'}
+      end
+    EOC
+    instance_eval(code)
+    return self.preinit_use_accessors
+  end
+
+  def preinit_use_accessors
+    return false
   end
 
   #
