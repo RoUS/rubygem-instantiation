@@ -33,8 +33,6 @@ end
 
 require 'versionomy'
 
-require 'preinit/settings'
-
 require 'pp'
 
 require 'ruby-debug'
@@ -82,6 +80,40 @@ Debugger.start
 # those already defined, or sets the variables directly without going
 # through an accessor method.
 #
+
+#:stopdoc:
+# :on_NameError
+# :use_accessors
+# :override_existing_values (? :force? :clobber?)
+#              An optional collection of keywords and their values.
+#              [<tt>:default</tt>] <i>Any</i>.  Default value to assign
+#                                  if an instance variable is specified
+#                                  without one (<i>e.g.</i>,
+#                                  <tt>new('varname')</tt>).
+#              [<tt>:on_NameError</tt>] <i>Symbol</i>.  Action to take
+#                                       if an invalid instance variable
+#                                       name appears in the hash.
+#                                       [<tt>:raise</tt>] A <i>NameError</i>
+#                                                         exception
+#                                                         will be raised
+#                                                         identifying
+#                                                         the invalid name.
+#                                       [<tt>:ignore</tt>] The key/value
+#                                                          pair with the
+#                                                          invalid name
+#                                                          will be silently
+#                                                          ignored.
+#                                       [<tt>:convert</tt>] An attempt will
+#                                                           be made to make
+#                                                           the name valid
+#                                                           (<i>e.g.</i>,
+#                                                           replacing
+#                                                           illegal
+#                                                           characters with
+#                                                           '<tt>_</tt>',
+#                                                           <i>etc.</i>).
+#:startdoc:
+
 module PreInit
 
   #
@@ -132,12 +164,38 @@ module PreInit
     # [<tt>NameError</tt>] The name in one of the tuples is not a valid
     #                      instance variable name.
     #
-    def import_instance_variables(target, tuples, options={})
+    def import_instance_variables(target, tuples, options_p={})
+      #
+      # If the target doesn't yet have any of our special methods,
+      # add them to it.  We count on 'em shortly.
+      #
       unless (target.respond_to?(:preinit_on_NameError=))
         target.extend(PreInit)
       end
+      #
+      # Get the current settings.
+      #
+      options = {
+        :on_NameError		=> target.preinit_on_NameError,
+        :overwrite_values	=> target.preinit_overwrite_values,
+        :use_accessors		=> target.preinit_use_accessors,
+      }
+      #
+      # Override with any that were passed in.
+      #
+      options.merge!(options_p)
       target.preinit_on_NameError = options[:on_NameError]
       target.preinit_use_accessors = options[:use_accessors]
+      target.preinit_overwrite_values = options[:overwrite_values]
+      #
+      # Use whatever the current settings have become.
+      #
+      action = target.preinit_on_NameError
+      use_accessors = target.preinit_use_accessors
+      overwrite = target.preinit_overwrite_values
+      #
+      # Let's get down to work.
+      #
       if (block_given? || tuples.kind_of?(Hash))
         tuples.each do |*segs|
           if (block_given?)
@@ -151,21 +209,35 @@ module PreInit
           # such?
           #
           retried = false
-          action = target.preinit_on_NameError
           begin
-            ivar = ivar.to_s.dup
-            ivar_setmeth = "#{ivar}=".to_sym
+            ivar = ivar.to_s.sub(%r!^:?@*!, '')
+            ivar_sym = ('@' + ivar).to_sym
+            ivar_setmeth = (ivar + '=').to_sym
+            #
+            # Check the syntax by fetching the symbolised name.
+            #
+            target.instance_variable_get(ivar_sym)
+            #
+            # Okey, we're still here -- so it's apparently a valid name.
+            # If we have a only-set-new restriction, check for that.
+            #
+            if ((! overwrite) \
+                && target.instance_variables.include?(ivar_sym.to_s))
+              raise TypeError.new('forbidden by rule: overwrite of ' +
+                                  ivar_sym.to_s +
+                                  ' by import '
+                                  )
+            end
             #
             # If there's already a 'foo=' method, potentially use it
             # rather than just setting the instance variable directly
             # -- thus preserving any special processing the class has
             # for the variable.
             #
-            if (target.preinit_use_accessors \
-                && target.respond_to?(ivar_setmeth))
+            if (use_accessors && target.respond_to?(ivar_setmeth))
               target.__send__(ivar_setmeth, ival)
             else
-              target.instance_variable_set("@#{ivar}".to_sym, ival)
+              target.instance_variable_set(ivar_sym, ival)
             end
           rescue NameError => e
             next if (action == :ignore)
@@ -201,6 +273,16 @@ module PreInit
       return action
     end
 
+    def declare_option_accessor(target, opt, bool)
+      code = <<-EOC
+        def preinit_#{opt.to_s}
+          return #{bool ? 'true' : 'false'}
+        end
+      EOC
+      target.instance_eval(code)
+      return target.__send__("preinit_#{opt}".to_sym)
+    end
+
   end
 
   def preinit_on_NameError=(action)
@@ -208,28 +290,29 @@ module PreInit
     return self.preinit_on_NameError
   end
 
+  def preinit_overwrite_values=(bool)
+    return PreInit.declare_option_accessor(self, :overwrite_values, bool)
+  end
+
+  def preinit_use_accessors=(bool)
+    return PreInit.declare_option_accessor(self, :use_accessors, bool)
+  end
+
+  #
+  # These methods are dynamically replaced when new values are set,
+  # so these just provide the defaults as it were.
+  #
   def preinit_on_NameError
     return :raise
   end
 
-  def preinit_use_accessors=(bool)
-    code = <<-EOC
-      def use_accessors
-        return #{bool ? 'true' : 'false'}
-      end
-    EOC
-    instance_eval(code)
-    return self.preinit_use_accessors
+  def preinit_overwrite_values
+    return true
   end
 
   def preinit_use_accessors
     return false
   end
-
-  #
-  # Controls affecting how the constructor functions.
-  #
-  attr_reader(:preinit_settings)
 
   #
   # === Description
@@ -271,10 +354,9 @@ module PreInit
   #                      The name in one of the tuples is not a valid
   #                      instance variable name.
   #
-  def initialize(*args, &block)
-    @preinit_settings = Settings.new(:on_NameError => :raise)
-    if (block_given? || (! args.empty?))
-      PreInit.import_instance_variables(*args, &block)
+  def initialize(hsh_p={}, options_p={}, &block)
+    if (block_given? || (! hsh_p.empty?))
+      PreInit.import_instance_variables(self, hsh_p, options_p, &block)
     end
   end
 
