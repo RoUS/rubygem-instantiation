@@ -221,7 +221,7 @@ string.</p></dd>
             
             <div class="method-source-code" id="declare_option_accessor-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 275</span>
+<span class="ruby-comment"># File lib/construction.rb, line 278</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">opt</span>, <span class="ruby-identifier">bool</span>)
   <span class="ruby-identifier">code</span> = <span class="ruby-string">        def construction_#{opt.to_s}          return #{bool ? 'true' : 'false'}        end</span>
   <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-identifier">code</span>)
@@ -346,9 +346,12 @@ Construction.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :z
         <span class="ruby-identifier">ivar_sym</span> = (<span class="ruby-string">'@'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">ivar</span>).<span class="ruby-identifier">to_sym</span>
         <span class="ruby-identifier">ivar_setmeth</span> = (<span class="ruby-identifier">ivar</span> <span class="ruby-operator">+</span> <span class="ruby-string">'='</span>).<span class="ruby-identifier">to_sym</span>
         <span class="ruby-comment">#</span>
-        <span class="ruby-comment"># Check the syntax by fetching the symbolised name.</span>
+        <span class="ruby-comment"># Check the syntax by trying to set the symbolised name</span>
+        <span class="ruby-comment"># on a test object.  (Can't just do an instance_variable_get</span>
+        <span class="ruby-comment"># on the target because it displays a warning rather than</span>
+        <span class="ruby-comment"># raining an exception.)</span>
         <span class="ruby-comment">#</span>
-        <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-identifier">ivar_sym</span>)
+        <span class="ruby-constant">Object</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-identifier">ivar_sym</span>, <span class="ruby-keyword">nil</span>)
         <span class="ruby-comment">#</span>
         <span class="ruby-comment"># Okey, we're still here -- so it's apparently a valid name.</span>
         <span class="ruby-comment"># If we have a only-set-new restriction, check for that.</span>
@@ -463,7 +466,7 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 356</span>
+<span class="ruby-comment"># File lib/construction.rb, line 359</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hsh_p</span>={}, <span class="ruby-identifier">options_p</span>={}, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">hsh_p</span>.<span class="ruby-identifier">empty?</span>))
     <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">hsh_p</span>, <span class="ruby-identifier">options_p</span>, &amp;<span class="ruby-identifier">block</span>)
@@ -498,7 +501,7 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="set_NameError_action-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 261</span>
+<span class="ruby-comment"># File lib/construction.rb, line 264</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">action</span>)
   <span class="ruby-identifier">action</span> <span class="ruby-operator">||=</span> <span class="ruby-value">:raise</span>
   <span class="ruby-keyword">unless</span> ([ <span class="ruby-value">:raise</span>, <span class="ruby-value">:ignore</span>, <span class="ruby-value">:convert</span> ].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">action</span>))
@@ -538,13 +541,13 @@ The name in one of the tuples is not a valid instance variable name.</p>
           <div class="method-description">
             
             <p>These methods are dynamically replaced when new values are set, so these
-just provide the defaults as it were.</p>
+just provide the defaults, as it were.</p>
             
 
             
             <div class="method-source-code" id="construction_on_NameError-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 304</span>
+<span class="ruby-comment"># File lib/construction.rb, line 307</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_on_NameError</span>
   <span class="ruby-keyword">return</span> <span class="ruby-value">:raise</span>
 <span class="ruby-keyword">end</span></pre>
@@ -577,7 +580,7 @@ just provide the defaults as it were.</p>
             
             <div class="method-source-code" id="construction_on_NameError-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 287</span>
+<span class="ruby-comment"># File lib/construction.rb, line 290</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_on_NameError=</span>(<span class="ruby-identifier">action</span>)
   <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">action</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">construction_on_NameError</span>
@@ -611,7 +614,7 @@ just provide the defaults as it were.</p>
             
             <div class="method-source-code" id="construction_overwrite_values-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 308</span>
+<span class="ruby-comment"># File lib/construction.rb, line 311</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_overwrite_values</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
 <span class="ruby-keyword">end</span></pre>
@@ -644,7 +647,7 @@ just provide the defaults as it were.</p>
             
             <div class="method-source-code" id="construction_overwrite_values-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 292</span>
+<span class="ruby-comment"># File lib/construction.rb, line 295</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_overwrite_values=</span>(<span class="ruby-identifier">bool</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:overwrite_values</span>, <span class="ruby-identifier">bool</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -677,7 +680,7 @@ just provide the defaults as it were.</p>
             
             <div class="method-source-code" id="construction_use_accessors-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 312</span>
+<span class="ruby-comment"># File lib/construction.rb, line 315</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_use_accessors</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
 <span class="ruby-keyword">end</span></pre>
@@ -710,7 +713,7 @@ just provide the defaults as it were.</p>
             
             <div class="method-source-code" id="construction_use_accessors-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 296</span>
+<span class="ruby-comment"># File lib/construction.rb, line 299</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_use_accessors=</span>(<span class="ruby-identifier">bool</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:use_accessors</span>, <span class="ruby-identifier">bool</span>)
 <span class="ruby-keyword">end</span></pre>
