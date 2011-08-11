@@ -4,7 +4,6 @@ require 'pp'
 class TestPreInit < Test::Unit::TestCase
 
   def setup
-    @psettings = PreInit::Settings.new
     @testdata_hash_symbolic_keys = {
       :ivar1	=> 1,
       :ivar_1	=> '1',
@@ -23,7 +22,7 @@ class TestPreInit < Test::Unit::TestCase
     @testdata_hash_bogus_keys = {
       :bogokeys	=> {
         '=bk1='	=> '_bk1_',
-        '@bk2'	=> '_bk2',
+        '*@bk2'	=> '_bk2',
         'really--+-long&bogus*one' \
 		=> 'really_long_bogus_one',
       },
@@ -35,14 +34,20 @@ class TestPreInit < Test::Unit::TestCase
       @testdata_hash_bogus_keys[raw] = edited
     end
   end
-  
+
+  #
+  # TODO: Add tests for the :overwrite_values and :use_accessors options!
+  #
+
   def test_001_empty
+    o_test = nil
     o_test = TestClass.new
     assert(o_test.kind_of?(TestClass))
     assert(o_test.kind_of?(PreInit))
   end
 
   def test_002_simple_hash_symbolic_keys
+    o_test = nil
     ihash = @testdata_hash_symbolic_keys
     o_test = TestClass.new(ihash)
     ihash.each do |ivar,ival|
@@ -51,6 +56,7 @@ class TestPreInit < Test::Unit::TestCase
   end
 
   def test_003_simple_hash_string_keys
+    o_test = nil
     ihash = @testdata_hash_string_keys
     o_test = TestClass.new(ihash)
     ihash.each do |ivar,ival|
@@ -59,6 +65,7 @@ class TestPreInit < Test::Unit::TestCase
   end
 
   def test_004_simple_hash_mixed_keys
+    o_test = nil
     ihash = @testdata_hash_mixed_keys
     o_test = TestClass.new(ihash)
     ihash.each do |ivar,ival|
@@ -66,21 +73,27 @@ class TestPreInit < Test::Unit::TestCase
     end
   end
 
-  def test_005_simple_hash_bogus_keys_raise
+  def test_005_simple_hash_bogus_keys_raise_default
+    o_test = nil
     ihash = @testdata_hash_bogus_keys
-    @psettings.on_NameError = :raise
-    o_test = TestClass.new(@psettings)
     assert_raise(NameError) do
-      PreInit.import_instance_variables(o_test, ihash)
+      o_test = TestClass.new(ihash)
     end
   end
 
-  def test_006_simple_hash_bogus_keys_ignore
+  def test_006_simple_hash_bogus_keys_raise_explicit
+    o_test = nil
     ihash = @testdata_hash_bogus_keys
-    @psettings.on_NameError = :ignore
-    o_test = TestClass.new(@psettings)
+    assert_raise(NameError) do
+      o_test = TestClass.new(ihash, :on_NameError => :raise)
+    end
+  end
+
+  def test_007_simple_hash_bogus_keys_ignore
+    o_test = nil
+    ihash = @testdata_hash_bogus_keys
     assert_nothing_raised() do
-      PreInit.import_instance_variables(o_test, ihash)
+      o_test = TestClass.new(ihash, :on_NameError => :ignore)
     end
     ihash.each do |ivar,ival|
       ivar_sym = "@#{ivar.to_s}".to_sym
@@ -94,98 +107,191 @@ class TestPreInit < Test::Unit::TestCase
     end
   end
 
-  def test_007_simple_hash_bogus_keys_convert
+  def test_008_simple_hash_bogus_keys_convert
+    o_test = nil
     ihash = @testdata_hash_bogus_keys
-    o_test = TestClass.new
-    o_test.preinit_options[:on_NameError] = :convert
     assert_nothing_raised() do
-      o_test.load_attrs(ihash)
+      o_test = TestClass.new(ihash, :on_NameError => :convert)
     end
     ihash.each do |ivar,ival|
-      ivar_sym = "@#{ivar.to_s}".to_sym
+      ivar_name = '@' + ivar.to_s
       if (ihash[:bogokeys].include?(ivar))
-        ivar_sym = "@#{ihash[:bogokeys][ivar]}".to_sym
+        ivar_name = '@' + ihash[:bogokeys][ivar].to_s
       end
+      ivar_sym = ivar_name.to_sym
+      assert(o_test.instance_variables.include?(ivar_name),
+             "Expecting '#{ivar_name}' to be '#{ivar_sym.inspect}'")
       assert_equal(ival, o_test.instance_variable_get(ivar_sym))
     end
   end
 
-  def test_102_postload_simple_hash_symbolic_keys
+  #
+  # Now test invoking the PreInit.import_instance_variables class
+  # method on empty instances that include the module.
+  #
+  def test_102_simple_hash_symbolic_keys
+    o_test = TestClass.new
     ihash = @testdata_hash_symbolic_keys
-    o_test = TestClass.new
-    result = o_test.load_attrs(ihash)
-    assert(result.kind_of?(TestClass))
-    assert_same(o_test, result)
+    PreInit.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
   end
 
-  def test_103_postload_simple_hash_string_keys
+  def test_103_simple_hash_string_keys
+    o_test = TestClass.new
     ihash = @testdata_hash_string_keys
-    o_test = TestClass.new
-    result = o_test.load_attrs(ihash)
-    assert(result.kind_of?(TestClass))
-    assert_same(o_test, result)
+    PreInit.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
   end
 
-  def test_202_blockload_simple_hash_symbolic_keys
+  def test_104_simple_hash_mixed_keys
+    o_test = TestClass.new
+    ihash = @testdata_hash_mixed_keys
+    PreInit.import_instance_variables(o_test, ihash)
+    ihash.each do |ivar,ival|
+      assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
+    end
+  end
+
+  def test_105_simple_hash_bogus_keys_raise_default
+    o_test = TestClass.new
+    ihash = @testdata_hash_bogus_keys
+    assert_raise(NameError) do
+      PreInit.import_instance_variables(o_test, ihash)
+    end
+  end
+
+  def test_105_simple_hash_bogus_keys_raise_explicit
+    o_test = TestClass.new
+    ihash = @testdata_hash_bogus_keys
+    assert_raise(NameError) do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :raise)
+    end
+  end
+
+  def test_107_simple_hash_bogus_keys_ignore
+    o_test = TestClass.new
+    ihash = @testdata_hash_bogus_keys
+    assert_nothing_raised() do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
+    end
+    ihash.each do |ivar,ival|
+      ivar_sym = "@#{ivar.to_s}".to_sym
+      if (ihash[:bogokeys].include?(ivar))
+        assert_raise(NameError) do
+          assert_nil(o_test.instance_variable_get(ivar_sym))
+        end
+      else
+        assert_equal(ival, o_test.instance_variable_get(ivar_sym))
+      end
+    end
+  end
+
+  def test_108_simple_hash_bogus_keys_convert
+    o_test = TestClass.new
+    ihash = @testdata_hash_bogus_keys
+    assert_nothing_raised() do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :convert)
+    end
+    ihash.each do |ivar,ival|
+      ivar_name = '@' + ivar.to_s
+      if (ihash[:bogokeys].include?(ivar))
+        ivar_name = '@' + ihash[:bogokeys][ivar].to_s
+      end
+      ivar_sym = ivar_name.to_sym
+      assert(o_test.instance_variables.include?(ivar_name),
+             "Expecting '#{ivar_name}' to be '#{ivar_sym.inspect}'")
+      assert_equal(ival, o_test.instance_variable_get(ivar_sym))
+    end
+  end
+
+  #
+  # Now try the PreInit.import_instance_variables invocation on instances
+  # of classes that *didn't* include the module.
+  #
+  def test_202_simple_hash_symbolic_keys
+    o_test = Object.new
     ihash = @testdata_hash_symbolic_keys
-    o_test = TestClass.new({}, ihash) { |o,*args|
-      (ivar, ival) = args.first
-      o.instance_variable_set("@#{ivar.to_s}".to_sym, ival)
-    }
+    PreInit.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
   end
 
-  def test_203_blockload_simple_hash_string_keys
+  def test_203_simple_hash_string_keys
+    o_test = Object.new
     ihash = @testdata_hash_string_keys
-    o_test = TestClass.new({}, ihash) { |o,*args|
-      (ivar, ival) = args.first
-      o.instance_variable_set("@#{ivar.to_s}".to_sym, ival)
-    }
+    PreInit.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
   end
 
-  def test_302_postblockload_simple_hash_symbolic_keys
-    ihash = @testdata_hash_symbolic_keys
-    o_test = TestClass.new
-    o_test.load_attrs(ihash) { |o,*args|
-      #
-      # We can do this test now, because the object has *definitely*
-      # already been created.
-      #
-      assert_same(o_test, o)
-      (ivar, ival) = args.first
-      o.instance_variable_set("@#{ivar.to_s}".to_sym, ival)
-    }
+  def test_204_simple_hash_mixed_keys
+    o_test = Object.new
+    ihash = @testdata_hash_mixed_keys
+    PreInit.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
   end
 
-  def test_303_postblockload_simple_hash_string_keys
-    ihash = @testdata_hash_string_keys
-    o_test = TestClass.new
-    o_test.load_attrs(ihash) { |o,*args|
-      #
-      # We can do this test now, because the object has *definitely*
-      # already been created.
-      #
-      assert_same(o_test, o)
-      (ivar, ival) = args.first
-      o.instance_variable_set("@#{ivar.to_s}".to_sym, ival)
-    }
-    ihash.each do |ivar,ival|
-      assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
+  def test_205_simple_hash_bogus_keys_raise_default
+    o_test = Object.new
+    ihash = @testdata_hash_bogus_keys
+    assert_raise(NameError) do
+      PreInit.import_instance_variables(o_test, ihash)
     end
   end
 
+  def test_205_simple_hash_bogus_keys_raise_explicit
+    o_test = Object.new
+    ihash = @testdata_hash_bogus_keys
+    assert_raise(NameError) do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :raise)
+    end
+  end
+
+  def test_207_simple_hash_bogus_keys_ignore
+    o_test = Object.new
+    ihash = @testdata_hash_bogus_keys
+    assert_nothing_raised() do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
+    end
+    ihash.each do |ivar,ival|
+      ivar_sym = "@#{ivar.to_s}".to_sym
+      if (ihash[:bogokeys].include?(ivar))
+        assert_raise(NameError) do
+          assert_nil(o_test.instance_variable_get(ivar_sym))
+        end
+      else
+        assert_equal(ival, o_test.instance_variable_get(ivar_sym))
+      end
+    end
+  end
+
+  def test_208_simple_hash_bogus_keys_convert
+    o_test = Object.new
+    ihash = @testdata_hash_bogus_keys
+    assert_nothing_raised() do
+      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :convert)
+    end
+    ihash.each do |ivar,ival|
+      ivar_name = '@' + ivar.to_s
+      if (ihash[:bogokeys].include?(ivar))
+        ivar_name = '@' + ihash[:bogokeys][ivar].to_s
+      end
+      ivar_sym = ivar_name.to_sym
+      assert(o_test.instance_variables.include?(ivar_name),
+             "Expecting '#{ivar_name}' to be '#{ivar_sym.inspect}'")
+      assert_equal(ival, o_test.instance_variable_get(ivar_sym))
+    end
+  end
+
+  #
+  # Now try all that with blocks.
+  #
 end

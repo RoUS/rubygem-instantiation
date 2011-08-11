@@ -214,9 +214,12 @@ module Construction
             ivar_sym = ('@' + ivar).to_sym
             ivar_setmeth = (ivar + '=').to_sym
             #
-            # Check the syntax by fetching the symbolised name.
+            # Check the syntax by trying to set the symbolised name
+            # on a test object.  (Can't just do an instance_variable_get
+            # on the target because it displays a warning rather than
+            # raining an exception.)
             #
-            target.instance_variable_get(ivar_sym)
+            Object.new.instance_variable_set(ivar_sym, nil)
             #
             # Okey, we're still here -- so it's apparently a valid name.
             # If we have a only-set-new restriction, check for that.
@@ -300,7 +303,7 @@ module Construction
 
   #
   # These methods are dynamically replaced when new values are set,
-  # so these just provide the defaults as it were.
+  # so these just provide the defaults, as it were.
   #
   def construction_on_NameError
     return :raise
