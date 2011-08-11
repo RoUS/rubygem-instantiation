@@ -1,4 +1,4 @@
-h1. preinit
+h1. construction
 
 
 h2. What
@@ -6,7 +6,7 @@ h2. What
 
 h2. Installing
 
-<pre syntax="ruby">sudo gem install preinit</pre>
+<pre syntax="ruby">sudo gem install construction</pre>
 
 h2. The basics
 
@@ -17,9 +17,9 @@ h2. Demonstration of usage
 
 h2. Forum
 
-"http://groups.google.com/group/preinit":http://groups.google.com/group/preinit
+"http://groups.google.com/group/construction":http://groups.google.com/group/construction
 
-TODO - create Google Group - preinit
+TODO - create Google Group - construction
 
 h2. How to submit patches
 
@@ -27,7 +27,7 @@ Read the "8 steps for fixing other people's code":http://drnicwilliams.com/2007/
 
 TODO - pick SVN or Git instructions
 
-The trunk repository is <code>svn://rubyforge.org/var/svn/preinit/trunk</code> for anonymous access.
+The trunk repository is <code>svn://rubyforge.org/var/svn/construction/trunk</code> for anonymous access.
 
 OOOORRRR
 
@@ -37,7 +37,7 @@ You can fetch the source from either:
 
 * rubyforge: "http://rubyforge.org/scm/?group_id=<%= rubyforge_project_id %>":http://rubyforge.org/scm/?group_id=<%= rubyforge_project_id %>
 
-<pre>git clone git://rubyforge.org/preinit.git</pre>
+<pre>git clone git://rubyforge.org/construction.git</pre>
 
 <% else %>
 
@@ -52,30 +52,30 @@ Or you can hack website/index.txt and make it all go away!!
 
 <% end %>
 
-* github: "http://github.com/GITHUB_USERNAME/preinit/tree/master":http://github.com/GITHUB_USERNAME/preinit/tree/master
+* github: "http://github.com/GITHUB_USERNAME/construction/tree/master":http://github.com/GITHUB_USERNAME/construction/tree/master
 
-<pre>git clone git://github.com/GITHUB_USERNAME/preinit.git</pre>
+<pre>git clone git://github.com/GITHUB_USERNAME/construction.git</pre>
 
 
 TODO - add "github_username: username" to ~/.rubyforge/user-config.yml and newgem will reuse it for future projects.
 
 
-* gitorious: "git://gitorious.org/preinit/mainline.git":git://gitorious.org/preinit/mainline.git
+* gitorious: "git://gitorious.org/construction/mainline.git":git://gitorious.org/construction/mainline.git
 
-<pre>git clone git://gitorious.org/preinit/mainline.git</pre>
+<pre>git clone git://gitorious.org/construction/mainline.git</pre>
 
 h3. Build and test instructions
 
-<pre>cd preinit
+<pre>cd construction
 rake test
 rake install_gem</pre>
 
 
 h2. License
 
-This code is free to use under the terms of the MIT license. 
+This code is free to use under the terms of the Apache Licence V2.0. 
 
 h2. Contact
 
-Comments are welcome. Send an email to "FIXME full name":mailto:FIXME email via the "forum":http://groups.google.com/group/preinit
+Comments are welcome. Send an email to "FIXME full name":mailto:FIXME email via the "forum":http://groups.google.com/group/construction
 

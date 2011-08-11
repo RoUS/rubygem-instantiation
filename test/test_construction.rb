@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 require 'pp'
 
-class TestPreInit < Test::Unit::TestCase
+class TestConstruction < Test::Unit::TestCase
 
   def setup
     @testdata_hash_symbolic_keys = {
@@ -43,7 +43,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = nil
     o_test = TestClass.new
     assert(o_test.kind_of?(TestClass))
-    assert(o_test.kind_of?(PreInit))
+    assert(o_test.kind_of?(Construction))
   end
 
   def test_002_simple_hash_symbolic_keys
@@ -126,13 +126,13 @@ class TestPreInit < Test::Unit::TestCase
   end
 
   #
-  # Now test invoking the PreInit.import_instance_variables class
+  # Now test invoking the Construction.import_instance_variables class
   # method on empty instances that include the module.
   #
   def test_102_simple_hash_symbolic_keys
     o_test = TestClass.new
     ihash = @testdata_hash_symbolic_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -141,7 +141,7 @@ class TestPreInit < Test::Unit::TestCase
   def test_103_simple_hash_string_keys
     o_test = TestClass.new
     ihash = @testdata_hash_string_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -150,7 +150,7 @@ class TestPreInit < Test::Unit::TestCase
   def test_104_simple_hash_mixed_keys
     o_test = TestClass.new
     ihash = @testdata_hash_mixed_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -160,7 +160,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = TestClass.new
     ihash = @testdata_hash_bogus_keys
     assert_raise(NameError) do
-      PreInit.import_instance_variables(o_test, ihash)
+      Construction.import_instance_variables(o_test, ihash)
     end
   end
 
@@ -168,7 +168,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = TestClass.new
     ihash = @testdata_hash_bogus_keys
     assert_raise(NameError) do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :raise)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :raise)
     end
   end
 
@@ -176,7 +176,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = TestClass.new
     ihash = @testdata_hash_bogus_keys
     assert_nothing_raised() do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
     end
     ihash.each do |ivar,ival|
       ivar_sym = "@#{ivar.to_s}".to_sym
@@ -194,7 +194,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = TestClass.new
     ihash = @testdata_hash_bogus_keys
     assert_nothing_raised() do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :convert)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :convert)
     end
     ihash.each do |ivar,ival|
       ivar_name = '@' + ivar.to_s
@@ -209,13 +209,13 @@ class TestPreInit < Test::Unit::TestCase
   end
 
   #
-  # Now try the PreInit.import_instance_variables invocation on instances
+  # Now try the Construction.import_instance_variables invocation on instances
   # of classes that *didn't* include the module.
   #
   def test_202_simple_hash_symbolic_keys
     o_test = Object.new
     ihash = @testdata_hash_symbolic_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -224,7 +224,7 @@ class TestPreInit < Test::Unit::TestCase
   def test_203_simple_hash_string_keys
     o_test = Object.new
     ihash = @testdata_hash_string_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -233,7 +233,7 @@ class TestPreInit < Test::Unit::TestCase
   def test_204_simple_hash_mixed_keys
     o_test = Object.new
     ihash = @testdata_hash_mixed_keys
-    PreInit.import_instance_variables(o_test, ihash)
+    Construction.import_instance_variables(o_test, ihash)
     ihash.each do |ivar,ival|
       assert_equal(ival, o_test.instance_variable_get("@#{ivar.to_s}".to_sym))
     end
@@ -243,7 +243,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = Object.new
     ihash = @testdata_hash_bogus_keys
     assert_raise(NameError) do
-      PreInit.import_instance_variables(o_test, ihash)
+      Construction.import_instance_variables(o_test, ihash)
     end
   end
 
@@ -251,7 +251,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = Object.new
     ihash = @testdata_hash_bogus_keys
     assert_raise(NameError) do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :raise)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :raise)
     end
   end
 
@@ -259,7 +259,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = Object.new
     ihash = @testdata_hash_bogus_keys
     assert_nothing_raised() do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :ignore)
     end
     ihash.each do |ivar,ival|
       ivar_sym = "@#{ivar.to_s}".to_sym
@@ -277,7 +277,7 @@ class TestPreInit < Test::Unit::TestCase
     o_test = Object.new
     ihash = @testdata_hash_bogus_keys
     assert_nothing_raised() do
-      PreInit.import_instance_variables(o_test, ihash, :on_NameError => :convert)
+      Construction.import_instance_variables(o_test, ihash, :on_NameError => :convert)
     end
     ihash.each do |ivar,ival|
       ivar_name = '@' + ivar.to_s
