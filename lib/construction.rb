@@ -48,10 +48,10 @@ Debugger.start
 # == Synopsis
 #
 #    require 'rubygems'
-#    require 'preinit'
+#    require 'construction'
 #
 #    class Foo
-#      include PreInit
+#      include Construction
 #        :
 #      attr_accessor(:ivar1)
 #      def initialize(*args)
@@ -66,16 +66,16 @@ Debugger.start
 #
 # == Description
 #
-# The <i>initialize</i> method provided by PreInit scans its argument
+# The <i>initialize</i> method provided by Construction scans its argument
 # list for hashes.  For each hash it finds, it treats the keys as
 # instance variable names, and sets them to the corresponding values.
 #
-# PreInit also provides a 'class' method (#import_instance_variables)
+# Construction also provides a 'class' method (#import_instance_variables)
 # that it uses internally to do the hash-to-instance-variable magic --
 # but which can also be used to perform the same magic on any arbitrary
-# object even if its class doesn't mix in the PreInit module.
+# object even if its class doesn't mix in the Construction module.
 #
-# <i><b>N.B.</b></i>: Mixing in PreInit does <i>not</i> set up access
+# <i><b>N.B.</b></i>: Mixing in Construction does <i>not</i> set up access
 # methods for the instance variables it processes!  It either uses
 # those already defined, or sets the variables directly without going
 # through an accessor method.
@@ -114,7 +114,7 @@ Debugger.start
 #                                                           <i>etc.</i>).
 #:startdoc:
 
-module PreInit
+module Construction
 
   #
   # Version number as a <i>Versionomy</i> object.
@@ -139,15 +139,15 @@ module PreInit
     # order to update or add values.
     #
     # :call-seq:
-    # PreInit.import_instance_variables<i>(object, *args)</i> => <i>object</i>
-    # PreInit.import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i>
+    # Construction.import_instance_variables<i>(object, *args)</i> => <i>object</i>
+    # Construction.import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i>
     #
     # === Arguments
     # [<i>target</i>] <i>Object</i>.  The instance that will potentially
     #                 have instance variables set from the argument list.
     # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
-    #                <i>Hash</i> or <i>PreInit::Settings</i> objects
-    #                or any combination thereof.  <i>PreInit::Settings</i>
+    #                <i>Hash</i> or <i>Construction::Settings</i> objects
+    #                or any combination thereof.  <i>Construction::Settings</i>
     #                objects will be installed (each in turn overriding any
     #                previously encountered) as the controls for the
     #                constructor.
@@ -157,7 +157,7 @@ module PreInit
     #
     # === Examples
     #  ex_1 = Object.new
-    #  PreInit.import_instance_variables(:ivar_1 => 'New string', :zed => :zed)
+    #  Construction.import_instance_variables(:ivar_1 => 'New string', :zed => :zed)
     #  => #<Object:0xb7403780 @zed=:zed, @ivar_1="New string">
     #
     # === Exceptions
@@ -169,30 +169,30 @@ module PreInit
       # If the target doesn't yet have any of our special methods,
       # add them to it.  We count on 'em shortly.
       #
-      unless (target.respond_to?(:preinit_on_NameError=))
-        target.extend(PreInit)
+      unless (target.respond_to?(:construction_on_NameError=))
+        target.extend(Construction)
       end
       #
       # Get the current settings.
       #
       options = {
-        :on_NameError		=> target.preinit_on_NameError,
-        :overwrite_values	=> target.preinit_overwrite_values,
-        :use_accessors		=> target.preinit_use_accessors,
+        :on_NameError		=> target.construction_on_NameError,
+        :overwrite_values	=> target.construction_overwrite_values,
+        :use_accessors		=> target.construction_use_accessors,
       }
       #
       # Override with any that were passed in.
       #
       options.merge!(options_p)
-      target.preinit_on_NameError = options[:on_NameError]
-      target.preinit_use_accessors = options[:use_accessors]
-      target.preinit_overwrite_values = options[:overwrite_values]
+      target.construction_on_NameError = options[:on_NameError]
+      target.construction_use_accessors = options[:use_accessors]
+      target.construction_overwrite_values = options[:overwrite_values]
       #
       # Use whatever the current settings have become.
       #
-      action = target.preinit_on_NameError
-      use_accessors = target.preinit_use_accessors
-      overwrite = target.preinit_overwrite_values
+      action = target.construction_on_NameError
+      use_accessors = target.construction_use_accessors
+      overwrite = target.construction_overwrite_values
       #
       # Let's get down to work.
       #
@@ -265,7 +265,7 @@ module PreInit
         raise ArgumentError.new("invalid action '#{action.inspect}'")
       end
       code = <<-EOC
-        def preinit_on_NameError
+        def construction_on_NameError
           return #{action.inspect}
         end
       EOC
@@ -275,42 +275,42 @@ module PreInit
 
     def declare_option_accessor(target, opt, bool)
       code = <<-EOC
-        def preinit_#{opt.to_s}
+        def construction_#{opt.to_s}
           return #{bool ? 'true' : 'false'}
         end
       EOC
       target.instance_eval(code)
-      return target.__send__("preinit_#{opt}".to_sym)
+      return target.__send__("construction_#{opt}".to_sym)
     end
 
   end
 
-  def preinit_on_NameError=(action)
-    PreInit.set_NameError_action(self, action)
-    return self.preinit_on_NameError
+  def construction_on_NameError=(action)
+    Construction.set_NameError_action(self, action)
+    return self.construction_on_NameError
   end
 
-  def preinit_overwrite_values=(bool)
-    return PreInit.declare_option_accessor(self, :overwrite_values, bool)
+  def construction_overwrite_values=(bool)
+    return Construction.declare_option_accessor(self, :overwrite_values, bool)
   end
 
-  def preinit_use_accessors=(bool)
-    return PreInit.declare_option_accessor(self, :use_accessors, bool)
+  def construction_use_accessors=(bool)
+    return Construction.declare_option_accessor(self, :use_accessors, bool)
   end
 
   #
   # These methods are dynamically replaced when new values are set,
   # so these just provide the defaults as it were.
   #
-  def preinit_on_NameError
+  def construction_on_NameError
     return :raise
   end
 
-  def preinit_overwrite_values
+  def construction_overwrite_values
     return true
   end
 
-  def preinit_use_accessors
+  def construction_use_accessors
     return false
   end
 
@@ -326,8 +326,8 @@ module PreInit
   #
   # === Arguments
   # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
-  #                <i>Hash</i> or <i>PreInit::Settings</i> objects
-  #                or any combination thereof.  <i>PreInit::Settings</i>
+  #                <i>Hash</i> or <i>Construction::Settings</i> objects
+  #                or any combination thereof.  <i>Construction::Settings</i>
   #                objects will be installed (each in turn overriding any
   #                previously encountered) as the controls for the
   #                constructor.
@@ -337,7 +337,7 @@ module PreInit
   #
   # === Examples
   #  class Foo
-  #    include PreInit
+  #    include Construction
   #  end
   #  ex_1 = Foo.new(:ivar1 => 1, 'ivar2' => ['an', 'array'])
   #  => #<Foo:0xb7551b50 @ivar2=["an", "array"], @ivar1=1>
@@ -350,13 +350,13 @@ module PreInit
   #  => #<Foo:0xb7547de4 @new_ivar_0=17>
   #
   # === Exceptions
-  # [<tt>NameError</tt>] (<i>Raised from PreInit.import_instance_variables</i>)
+  # [<tt>NameError</tt>] (<i>Raised from Construction.import_instance_variables</i>)
   #                      The name in one of the tuples is not a valid
   #                      instance variable name.
   #
   def initialize(hsh_p={}, options_p={}, &block)
     if (block_given? || (! hsh_p.empty?))
-      PreInit.import_instance_variables(self, hsh_p, options_p, &block)
+      Construction.import_instance_variables(self, hsh_p, options_p, &block)
     end
   end
 
