@@ -1,9 +1,9 @@
 require 'stringio'
 require 'test/unit'
-require File.dirname(__FILE__) + '/../lib/construction'
+require File.dirname(__FILE__) + '/../lib/instantiation'
 
 class TestClass
 
-  include Construction
+  include Instantiation
 
 end

@@ -1,4 +1,4 @@
-= Construction
+= Instantiation
 
 * http://github.com/#{github_username}/#{project_name}
 

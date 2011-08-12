@@ -48,10 +48,10 @@ Debugger.start
 # == Synopsis
 #
 #    require 'rubygems'
-#    require 'construction'
+#    require 'instantiation'
 #
 #    class Foo
-#      include Construction
+#      include Instantiation
 #        :
 #      attr_accessor(:ivar1)
 #      def initialize(*args)
@@ -66,16 +66,16 @@ Debugger.start
 #
 # == Description
 #
-# The <i>initialize</i> method provided by Construction scans its argument
+# The <i>initialize</i> method provided by Instantiation scans its argument
 # list for hashes.  For each hash it finds, it treats the keys as
 # instance variable names, and sets them to the corresponding values.
 #
-# Construction also provides a 'class' method (#import_instance_variables)
+# Instantiation also provides a 'class' method (#import_instance_variables)
 # that it uses internally to do the hash-to-instance-variable magic --
 # but which can also be used to perform the same magic on any arbitrary
-# object even if its class doesn't mix in the Construction module.
+# object even if its class doesn't mix in the Instantiation module.
 #
-# <i><b>N.B.</b></i>: Mixing in Construction does <i>not</i> set up access
+# <i><b>N.B.</b></i>: Mixing in Instantiation does <i>not</i> set up access
 # methods for the instance variables it processes!  It either uses
 # those already defined, or sets the variables directly without going
 # through an accessor method.
@@ -84,7 +84,9 @@ Debugger.start
 #:stopdoc:
 # :on_NameError
 # :use_accessors
-# :override_existing_values (? :force? :clobber?)
+# :overwrite_values
+# :default_values { :key => defval, ... }
+# :require_accessors (?)
 #              An optional collection of keywords and their values.
 #              [<tt>:default</tt>] <i>Any</i>.  Default value to assign
 #                                  if an instance variable is specified
@@ -114,8 +116,17 @@ Debugger.start
 #                                                           <i>etc.</i>).
 #:startdoc:
 
-module Construction
+#
+# A little fribbery to define a shortcut name.
+#
+module Instantiation
+end
+CXN = Instantiation unless (defined?(CXN))
 
+#
+# Reopen the module to start adding *real* comment.
+#
+module Instantiation
   #
   # Version number as a <i>Versionomy</i> object.
   #
@@ -130,6 +141,14 @@ module Construction
   #
   class << self
 
+    Options = [
+               :on_NameError,
+               :overwrite_values,
+               :use_accessors,
+               :require_accessors,
+               :default_values,
+              ]
+
     #
     # === Description
     #
@@ -139,15 +158,15 @@ module Construction
     # order to update or add values.
     #
     # :call-seq:
-    # Construction.import_instance_variables<i>(object, *args)</i> => <i>object</i>
-    # Construction.import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i>
+    # Instantiation.import_instance_variables<i>(object, *args)</i> => <i>object</i>
+    # Instantiation.import_instance_variables<i>(object, *args) { |obj,*args| block }</i> => <i>object</i>
     #
     # === Arguments
     # [<i>target</i>] <i>Object</i>.  The instance that will potentially
     #                 have instance variables set from the argument list.
     # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
-    #                <i>Hash</i> or <i>Construction::Settings</i> objects
-    #                or any combination thereof.  <i>Construction::Settings</i>
+    #                <i>Hash</i> or <i>Instantiation::Settings</i> objects
+    #                or any combination thereof.  <i>Instantiation::Settings</i>
     #                objects will be installed (each in turn overriding any
     #                previously encountered) as the controls for the
     #                constructor.
@@ -157,7 +176,7 @@ module Construction
     #
     # === Examples
     #  ex_1 = Object.new
-    #  Construction.import_instance_variables(:ivar_1 => 'New string', :zed => :zed)
+    #  Instantiation.import_instance_variables(:ivar_1 => 'New string', :zed => :zed)
     #  => #<Object:0xb7403780 @zed=:zed, @ivar_1="New string">
     #
     # === Exceptions
@@ -169,30 +188,35 @@ module Construction
       # If the target doesn't yet have any of our special methods,
       # add them to it.  We count on 'em shortly.
       #
-      unless (target.respond_to?(:construction_on_NameError=))
-        target.extend(Construction)
+      unless (target.respond_to?(:i12n_on_NameError=))
+        target.extend(Instantiation)
       end
       #
       # Get the current settings.
       #
-      options = {
-        :on_NameError		=> target.construction_on_NameError,
-        :overwrite_values	=> target.construction_overwrite_values,
-        :use_accessors		=> target.construction_use_accessors,
+      options = Options.inject({}) { |memo,opsym|
+        memo[opsym] = target.__send__(('i12n_' + opsym.to_s).to_sym)
+        memo
       }
       #
       # Override with any that were passed in.
       #
       options.merge!(options_p)
-      target.construction_on_NameError = options[:on_NameError]
-      target.construction_use_accessors = options[:use_accessors]
-      target.construction_overwrite_values = options[:overwrite_values]
+      options.each do |opsym,val|
+        unless (Options.include?(opsym))
+          options.delete(opsym)
+          next
+        end
+        accessor_name = 'i12n_' + opsym.to_s
+        target.__send__((accessor_name + '=').to_sym, val)
+      end
       #
-      # Use whatever the current settings have become.
+      # Reset our list to whatever the values have become.
       #
-      action = target.construction_on_NameError
-      use_accessors = target.construction_use_accessors
-      overwrite = target.construction_overwrite_values
+      Options.each do |opsym|
+        accessor_name = 'i12n_' + opsym.to_s
+        options[opsym] = target.__send__(accessor_name.to_sym)
+      end
       #
       # Let's get down to work.
       #
@@ -224,7 +248,7 @@ module Construction
             # Okey, we're still here -- so it's apparently a valid name.
             # If we have a only-set-new restriction, check for that.
             #
-            if ((! overwrite) \
+            if ((! options[:overwrite_values]) \
                 && target.instance_variables.include?(ivar_sym.to_s))
               raise TypeError.new('forbidden by rule: overwrite of ' +
                                   ivar_sym.to_s +
@@ -237,15 +261,15 @@ module Construction
             # -- thus preserving any special processing the class has
             # for the variable.
             #
-            if (use_accessors && target.respond_to?(ivar_setmeth))
+            if (options[:use_accessors] && target.respond_to?(ivar_setmeth))
               target.__send__(ivar_setmeth, ival)
             else
               target.instance_variable_set(ivar_sym, ival)
             end
           rescue NameError => e
-            next if (action == :ignore)
-            raise if ((action == :raise) || retried)
-            if (action == :convert)
+            next if (options[:on_NameError] == :ignore)
+            raise if ((options[:on_NameError] == :raise) || retried)
+            if (options[:on_NameError] == :convert)
               retried = true
               #
               # Turn bogus characters (sequences of one or more) into single
@@ -268,7 +292,7 @@ module Construction
         raise ArgumentError.new("invalid action '#{action.inspect}'")
       end
       code = <<-EOC
-        def construction_on_NameError
+        def i12n_on_NameError
           return #{action.inspect}
         end
       EOC
@@ -276,44 +300,73 @@ module Construction
       return action
     end
 
-    def declare_option_accessor(target, opt, bool)
+    def declare_option_accessor(target, opt, val, type)
+      methname = 'i12n_' + opt.to_s
       code = <<-EOC
-        def construction_#{opt.to_s}
-          return #{bool ? 'true' : 'false'}
+        def #{methname}
+          return #{type.eql?(:Boolean) ? (val ? 'true' : 'false') : val}
         end
       EOC
       target.instance_eval(code)
-      return target.__send__("construction_#{opt}".to_sym)
+      return target.__send__(methname.to_sym)
     end
 
   end
 
-  def construction_on_NameError=(action)
-    Construction.set_NameError_action(self, action)
-    return self.construction_on_NameError
+  def i12n_default_values=(val)
+    return CXN.declare_option_accessor(self,
+                                       :default_values,
+                                       val,
+                                       :nonBoolean)
   end
 
-  def construction_overwrite_values=(bool)
-    return Construction.declare_option_accessor(self, :overwrite_values, bool)
+  def i12n_on_NameError=(action)
+    CXN.set_NameError_action(self, action)
+    return self.i12n_on_NameError
   end
 
-  def construction_use_accessors=(bool)
-    return Construction.declare_option_accessor(self, :use_accessors, bool)
+  def i12n_overwrite_values=(val)
+    return CXN.declare_option_accessor(self,
+                                       :overwrite_values,
+                                       val,
+                                       :Boolean)
+  end
+
+  def i12n_require_accessors=(val)
+    return CXN.declare_option_accessor(self,
+                                       :require_accessors,
+                                       val,
+                                       :Boolean)
+  end
+
+  def i12n_use_accessors=(val)
+    return CXN.declare_option_accessor(self,
+                                       :use_accessors,
+                                       val,
+                                       :Boolean)
   end
 
   #
   # These methods are dynamically replaced when new values are set,
   # so these just provide the defaults, as it were.
   #
-  def construction_on_NameError
+  def i12n_default_values
+    return {}
+  end
+
+  def i12n_on_NameError
     return :raise
   end
 
-  def construction_overwrite_values
+  def i12n_overwrite_values
     return true
   end
 
-  def construction_use_accessors
+  def i12n_require_accessors
+    return false
+  end
+
+  def i12n_use_accessors
     return false
   end
 
@@ -329,8 +382,8 @@ module Construction
   #
   # === Arguments
   # [<i>*args</i>] <i>Array</i>.  Elements (zero or more) may be
-  #                <i>Hash</i> or <i>Construction::Settings</i> objects
-  #                or any combination thereof.  <i>Construction::Settings</i>
+  #                <i>Hash</i> or <i>Instantiation::Settings</i> objects
+  #                or any combination thereof.  <i>Instantiation::Settings</i>
   #                objects will be installed (each in turn overriding any
   #                previously encountered) as the controls for the
   #                constructor.
@@ -340,7 +393,7 @@ module Construction
   #
   # === Examples
   #  class Foo
-  #    include Construction
+  #    include Instantiation
   #  end
   #  ex_1 = Foo.new(:ivar1 => 1, 'ivar2' => ['an', 'array'])
   #  => #<Foo:0xb7551b50 @ivar2=["an", "array"], @ivar1=1>
@@ -353,13 +406,13 @@ module Construction
   #  => #<Foo:0xb7547de4 @new_ivar_0=17>
   #
   # === Exceptions
-  # [<tt>NameError</tt>] (<i>Raised from Construction.import_instance_variables</i>)
+  # [<tt>NameError</tt>] (<i>Raised from Instantiation.import_instance_variables</i>)
   #                      The name in one of the tuples is not a valid
   #                      instance variable name.
   #
   def initialize(hsh_p={}, options_p={}, &block)
     if (block_given? || (! hsh_p.empty?))
-      Construction.import_instance_variables(self, hsh_p, options_p, &block)
+      CXN.import_instance_variables(self, hsh_p, options_p, &block)
     end
   end
 

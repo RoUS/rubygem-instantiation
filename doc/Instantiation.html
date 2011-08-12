@@ -5,7 +5,7 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 
-  <title>Module: Construction</title>
+  <title>Module: Instantiation</title>
 
   <link rel="stylesheet" href="./rdoc.css" type="text/css" media="screen" />
 
@@ -34,8 +34,8 @@
         <div class="section-body">
           <ul>
           
-            <li><a href="./lib/construction_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
-              class="thickbox" title="lib/construction.rb">lib/construction.rb</a></li>
+            <li><a href="./lib/instantiation_rb.html?TB_iframe=true&amp;height=550&amp;width=785"
+              class="thickbox" title="lib/instantiation.rb">lib/instantiation.rb</a></li>
           
           </ul>
         </div>
@@ -65,17 +65,25 @@
           
           <li><a href="#method-c-set_NameError_action">::set_NameError_action</a></li>
           
-          <li><a href="#method-i-construction_on_NameError">#construction_on_NameError</a></li>
+          <li><a href="#method-i-i12n_default_values">#i12n_default_values</a></li>
           
-          <li><a href="#method-i-construction_on_NameError-3D">#construction_on_NameError=</a></li>
+          <li><a href="#method-i-i12n_default_values-3D">#i12n_default_values=</a></li>
           
-          <li><a href="#method-i-construction_overwrite_values">#construction_overwrite_values</a></li>
+          <li><a href="#method-i-i12n_on_NameError">#i12n_on_NameError</a></li>
           
-          <li><a href="#method-i-construction_overwrite_values-3D">#construction_overwrite_values=</a></li>
+          <li><a href="#method-i-i12n_on_NameError-3D">#i12n_on_NameError=</a></li>
           
-          <li><a href="#method-i-construction_use_accessors">#construction_use_accessors</a></li>
+          <li><a href="#method-i-i12n_overwrite_values">#i12n_overwrite_values</a></li>
           
-          <li><a href="#method-i-construction_use_accessors-3D">#construction_use_accessors=</a></li>
+          <li><a href="#method-i-i12n_overwrite_values-3D">#i12n_overwrite_values=</a></li>
+          
+          <li><a href="#method-i-i12n_require_accessors">#i12n_require_accessors</a></li>
+          
+          <li><a href="#method-i-i12n_require_accessors-3D">#i12n_require_accessors=</a></li>
+          
+          <li><a href="#method-i-i12n_use_accessors">#i12n_use_accessors</a></li>
+          
+          <li><a href="#method-i-i12n_use_accessors-3D">#i12n_use_accessors=</a></li>
           
         </ul>
       </div>
@@ -118,7 +126,9 @@
 
         <ul class="link-list">
         
-          <li><a href="./Construction.html">Construction</a></li>
+          <li><a href="./Instantiation.html">Instantiation</a></li>
+        
+          <li><a href="./Object.html">Object</a></li>
         
         </ul>
         <div id="no-class-search-results" style="display: none;">No matching classes.</div>
@@ -129,40 +139,14 @@
   </div>
 
   <div id="documentation">
-    <h1 class="module">Construction</h1>
+    <h1 class="module">Instantiation</h1>
 
     <div id="description" class="description">
       
-<p>:on_NameError :use_accessors :override_existing_values (? :force?
-:clobber?)</p>
+<p>A little fribbery to define a shortcut name.</p>
+<hr style="height: 1px">
 
-<pre>An optional collection of keywords and their values.
-[&lt;tt&gt;:default&lt;/tt&gt;] &lt;i&gt;Any&lt;/i&gt;.  Default value to assign
-                    if an instance variable is specified
-                    without one (&lt;i&gt;e.g.&lt;/i&gt;,
-                    &lt;tt&gt;new('varname')&lt;/tt&gt;).
-[&lt;tt&gt;:on_NameError&lt;/tt&gt;] &lt;i&gt;Symbol&lt;/i&gt;.  Action to take
-                         if an invalid instance variable
-                         name appears in the hash.
-                         [&lt;tt&gt;:raise&lt;/tt&gt;] A &lt;i&gt;NameError&lt;/i&gt;
-                                           exception
-                                           will be raised
-                                           identifying
-                                           the invalid name.
-                         [&lt;tt&gt;:ignore&lt;/tt&gt;] The key/value
-                                            pair with the
-                                            invalid name
-                                            will be silently
-                                            ignored.
-                         [&lt;tt&gt;:convert&lt;/tt&gt;] An attempt will
-                                             be made to make
-                                             the name valid
-                                             (&lt;i&gt;e.g.&lt;/i&gt;,
-                                             replacing
-                                             illegal
-                                             characters with
-                                             '&lt;tt&gt;_&lt;/tt&gt;',
-                                             &lt;i&gt;etc.&lt;/i&gt;).</pre>
+<p>Reopen the module to start adding <b>real</b> comment.</p>
 
     </div><!-- description -->
 
@@ -178,15 +162,20 @@
         <h3 class="section-header">Constants</h3>
         <dl>
         
+          <dt><a name="Options">Options</a></dt>
+          
+          <dd class="description"></dd>
+          
+        
           <dt><a name="VERSION">VERSION</a></dt>
           
-          <dd class="description"><p><a href="Construction.html#Version">Version</a> number as an extractable
+          <dd class="description"><p><a href="Instantiation.html#Version">Version</a> number as an extractable
 string.</p></dd>
           
         
           <dt><a name="Version">Version</a></dt>
           
-          <dd class="description"><p><a href="Construction.html#Version">Version</a> number as a
+          <dd class="description"><p><a href="Instantiation.html#Version">Version</a> number as a
 <em>Versionomy</em> object.</p></dd>
           
         
@@ -208,7 +197,7 @@ string.</p></dd>
           
           <div class="method-heading">
             <span class="method-name">declare_option_accessor</span><span
-              class="method-args">(target, opt, bool)</span>
+              class="method-args">(target, opt, val, type)</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
           
@@ -221,11 +210,12 @@ string.</p></dd>
             
             <div class="method-source-code" id="declare_option_accessor-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 278</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">opt</span>, <span class="ruby-identifier">bool</span>)
-  <span class="ruby-identifier">code</span> = <span class="ruby-string">        def construction_#{opt.to_s}          return #{bool ? 'true' : 'false'}        end</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 302</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">opt</span>, <span class="ruby-identifier">val</span>, <span class="ruby-identifier">type</span>)
+  <span class="ruby-identifier">methname</span> = <span class="ruby-string">'i12n_'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opt</span>.<span class="ruby-identifier">to_s</span>
+  <span class="ruby-identifier">code</span> = <span class="ruby-string">        def #{methname}          return #{type.eql?(:Boolean) ? (val ? 'true' : 'false') : val}        end</span>
   <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-identifier">code</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-node">&quot;construction_#{opt}&quot;</span>.<span class="ruby-identifier">to_sym</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">methname</span>.<span class="ruby-identifier">to_sym</span>)
 <span class="ruby-keyword">end</span></pre>
             </div><!-- declare_option_accessor-source -->
             
@@ -267,13 +257,13 @@ invoked on an existing object in order to update or add values.</p>
 <h3>Arguments</h3>
 <dl class="rdoc-list"><dt><em>target</em></dt>
 <dd>
-<p><em>Object</em>.  The instance that will potentially have instance
-variables set from the argument list.</p>
+<p><em><a href="Object.html">Object</a></em>.  The instance that will
+potentially have instance variables set from the argument list.</p>
 </dd><dt><em>*args</em></dt>
 <dd>
 <p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or
-<em>Construction::Settings</em> objects or any combination thereof. 
-<em>Construction::Settings</em> objects will be installed (each in turn
+<em>Instantiation::Settings</em> objects or any combination thereof. 
+<em>Instantiation::Settings</em> objects will be installed (each in turn
 overriding any previously encountered) as the controls for the constructor.
 The names (keys) of Hash elements will be treated as names of instance
 variables, and the values as their initial contents.</p>
@@ -282,7 +272,7 @@ variables, and the values as their initial contents.</p>
 <h3>Examples</h3>
 
 <pre>ex_1 = Object.new
-Construction.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
+Instantiation.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :zed)
 =&gt; #&lt;Object:0xb7403780 @zed=:zed, @ivar_1=&quot;New string&quot;&gt;</pre>
 
 <h3>Exceptions</h3>
@@ -295,36 +285,41 @@ Construction.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :z
             
             <div class="method-source-code" id="import_instance_variables-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 166</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 185</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">tuples</span>, <span class="ruby-identifier">options_p</span>={})
   <span class="ruby-comment">#</span>
   <span class="ruby-comment"># If the target doesn't yet have any of our special methods,</span>
   <span class="ruby-comment"># add them to it.  We count on 'em shortly.</span>
   <span class="ruby-comment">#</span>
-  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:construction_on_NameError=</span>))
-    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Construction</span>)
+  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:i12n_on_NameError=</span>))
+    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Instantiation</span>)
   <span class="ruby-keyword">end</span>
   <span class="ruby-comment">#</span>
   <span class="ruby-comment"># Get the current settings.</span>
   <span class="ruby-comment">#</span>
-  <span class="ruby-identifier">options</span> = {
-    <span class="ruby-value">:on_NameError</span>           =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_on_NameError</span>,
-    <span class="ruby-value">:overwrite_values</span>       =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_overwrite_values</span>,
-    <span class="ruby-value">:use_accessors</span>          =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_use_accessors</span>,
+  <span class="ruby-identifier">options</span> = <span class="ruby-constant">Options</span>.<span class="ruby-identifier">inject</span>({}) { <span class="ruby-operator">|</span><span class="ruby-identifier">memo</span>,<span class="ruby-identifier">opsym</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">memo</span>[<span class="ruby-identifier">opsym</span>] = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>((<span class="ruby-string">'i12n_'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opsym</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">to_sym</span>)
+    <span class="ruby-identifier">memo</span>
   }
   <span class="ruby-comment">#</span>
   <span class="ruby-comment"># Override with any that were passed in.</span>
   <span class="ruby-comment">#</span>
   <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">options_p</span>)
-  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_on_NameError</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:on_NameError</span>]
-  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_use_accessors</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:use_accessors</span>]
-  <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_overwrite_values</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:overwrite_values</span>]
+  <span class="ruby-identifier">options</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opsym</span>,<span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">unless</span> (<span class="ruby-constant">Options</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opsym</span>))
+      <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">opsym</span>)
+      <span class="ruby-keyword">next</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">accessor_name</span> = <span class="ruby-string">'i12n_'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opsym</span>.<span class="ruby-identifier">to_s</span>
+    <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>((<span class="ruby-identifier">accessor_name</span> <span class="ruby-operator">+</span> <span class="ruby-string">'='</span>).<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">val</span>)
+  <span class="ruby-keyword">end</span>
   <span class="ruby-comment">#</span>
-  <span class="ruby-comment"># Use whatever the current settings have become.</span>
+  <span class="ruby-comment"># Reset our list to whatever the values have become.</span>
   <span class="ruby-comment">#</span>
-  <span class="ruby-identifier">action</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_on_NameError</span>
-  <span class="ruby-identifier">use_accessors</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_use_accessors</span>
-  <span class="ruby-identifier">overwrite</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">construction_overwrite_values</span>
+  <span class="ruby-constant">Options</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opsym</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">accessor_name</span> = <span class="ruby-string">'i12n_'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opsym</span>.<span class="ruby-identifier">to_s</span>
+    <span class="ruby-identifier">options</span>[<span class="ruby-identifier">opsym</span>] = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">accessor_name</span>.<span class="ruby-identifier">to_sym</span>)
+  <span class="ruby-keyword">end</span>
   <span class="ruby-comment">#</span>
   <span class="ruby-comment"># Let's get down to work.</span>
   <span class="ruby-comment">#</span>
@@ -356,7 +351,7 @@ Construction.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :z
         <span class="ruby-comment"># Okey, we're still here -- so it's apparently a valid name.</span>
         <span class="ruby-comment"># If we have a only-set-new restriction, check for that.</span>
         <span class="ruby-comment">#</span>
-        <span class="ruby-keyword">if</span> ((<span class="ruby-operator">!</span> <span class="ruby-identifier">overwrite</span>)                  <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">ivar_sym</span>.<span class="ruby-identifier">to_s</span>))
+        <span class="ruby-keyword">if</span> ((<span class="ruby-operator">!</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:overwrite_values</span>])                  <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variables</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">ivar_sym</span>.<span class="ruby-identifier">to_s</span>))
           <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">'forbidden by rule: overwrite of '</span> <span class="ruby-operator">+</span>
                               <span class="ruby-identifier">ivar_sym</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span>
                               <span class="ruby-string">' by import '</span>
@@ -368,15 +363,15 @@ Construction.import_instance_variables(:ivar_1 =&gt; 'New string', :zed =&gt; :z
         <span class="ruby-comment"># -- thus preserving any special processing the class has</span>
         <span class="ruby-comment"># for the variable.</span>
         <span class="ruby-comment">#</span>
-        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">use_accessors</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">ivar_setmeth</span>))
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">options</span>[<span class="ruby-value">:use_accessors</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">target</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">ivar_setmeth</span>))
           <span class="ruby-identifier">target</span>.<span class="ruby-identifier">__send__</span>(<span class="ruby-identifier">ivar_setmeth</span>, <span class="ruby-identifier">ival</span>)
         <span class="ruby-keyword">else</span>
           <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-identifier">ivar_sym</span>, <span class="ruby-identifier">ival</span>)
         <span class="ruby-keyword">end</span>
       <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NameError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
-        <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ignore</span>)
-        <span class="ruby-identifier">raise</span> <span class="ruby-keyword">if</span> ((<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:raise</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">retried</span>)
-        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:convert</span>)
+        <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">options</span>[<span class="ruby-value">:on_NameError</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:ignore</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-keyword">if</span> ((<span class="ruby-identifier">options</span>[<span class="ruby-value">:on_NameError</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:raise</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">retried</span>)
+        <span class="ruby-keyword">if</span> (<span class="ruby-identifier">options</span>[<span class="ruby-value">:on_NameError</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:convert</span>)
           <span class="ruby-identifier">retried</span> = <span class="ruby-keyword">true</span>
           <span class="ruby-comment">#</span>
           <span class="ruby-comment"># Turn bogus characters (sequences of one or more) into single</span>
@@ -432,8 +427,8 @@ it according to the key/value pairs in any hashes that were passed.</p>
 <dl class="rdoc-list"><dt><em>*args</em></dt>
 <dd>
 <p><em>Array</em>.  Elements (zero or more) may be <em>Hash</em> or
-<em>Construction::Settings</em> objects or any combination thereof. 
-<em>Construction::Settings</em> objects will be installed (each in turn
+<em>Instantiation::Settings</em> objects or any combination thereof. 
+<em>Instantiation::Settings</em> objects will be installed (each in turn
 overriding any previously encountered) as the controls for the constructor.
 The names (keys) of Hash elements will be treated as names of instance
 variables, and the values as their initial contents.</p>
@@ -442,7 +437,7 @@ variables, and the values as their initial contents.</p>
 <h3>Examples</h3>
 
 <pre>class Foo
-  include Construction
+  include Instantiation
 end
 ex_1 = Foo.new(:ivar1 =&gt; 1, 'ivar2' =&gt; ['an', 'array'])
 =&gt; #&lt;Foo:0xb7551b50 @ivar2=[&quot;an&quot;, &quot;array&quot;], @ivar1=1&gt;
@@ -458,7 +453,7 @@ ex_2 = Foo.new({ :op1 =&gt; 1 }, 17) { |o,*args|
 <dl class="rdoc-list"><dt><tt>NameError</tt></dt>
 <dd>
 <p>(<em>Raised from <a
-href="Construction.html#method-c-import_instance_variables">Construction.import_instance_variables</a></em>)
+href="Instantiation.html#method-c-import_instance_variables">Instantiation.import_instance_variables</a></em>)
 The name in one of the tuples is not a valid instance variable name.</p>
 </dd></dl>
             
@@ -466,10 +461,10 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="new-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 359</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 412</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hsh_p</span>={}, <span class="ruby-identifier">options_p</span>={}, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">block_given?</span> <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span> <span class="ruby-identifier">hsh_p</span>.<span class="ruby-identifier">empty?</span>))
-    <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">hsh_p</span>, <span class="ruby-identifier">options_p</span>, &amp;<span class="ruby-identifier">block</span>)
+    <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">import_instance_variables</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">hsh_p</span>, <span class="ruby-identifier">options_p</span>, &amp;<span class="ruby-identifier">block</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
             </div><!-- new-source -->
@@ -501,13 +496,13 @@ The name in one of the tuples is not a valid instance variable name.</p>
             
             <div class="method-source-code" id="set_NameError_action-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 264</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 288</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">action</span>)
   <span class="ruby-identifier">action</span> <span class="ruby-operator">||=</span> <span class="ruby-value">:raise</span>
   <span class="ruby-keyword">unless</span> ([ <span class="ruby-value">:raise</span>, <span class="ruby-value">:ignore</span>, <span class="ruby-value">:convert</span> ].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">action</span>))
     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;invalid action '#{action.inspect}'&quot;</span>)
   <span class="ruby-keyword">end</span>
-  <span class="ruby-identifier">code</span> = <span class="ruby-string">        def construction_on_NameError          return #{action.inspect}        end</span>
+  <span class="ruby-identifier">code</span> = <span class="ruby-string">        def i12n_on_NameError          return #{action.inspect}        end</span>
   <span class="ruby-identifier">target</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-identifier">code</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">action</span>
 <span class="ruby-keyword">end</span></pre>
@@ -527,12 +522,12 @@ The name in one of the tuples is not a valid instance variable name.</p>
         <h3 class="section-header">Public Instance Methods</h3>
 
       
-        <div id="construction_on_NameError-method" class="method-detail ">
-          <a name="method-i-construction_on_NameError"></a>
+        <div id="i12n_default_values-method" class="method-detail ">
+          <a name="method-i-i12n_default_values"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_on_NameError</span><span
+            <span class="method-name">i12n_default_values</span><span
               class="method-args">()</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
@@ -545,28 +540,97 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_on_NameError-source">
+            <div class="method-source-code" id="i12n_default_values-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 307</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_on_NameError</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-value">:raise</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 352</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_default_values</span>
+  <span class="ruby-keyword">return</span> {}
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_on_NameError-source -->
+            </div><!-- i12n_default_values-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_on_NameError-method -->
+        </div><!-- i12n_default_values-method -->
 
       
-        <div id="construction_on_NameError-3D-method" class="method-detail ">
-          <a name="method-i-construction_on_NameError-3D"></a>
+        <div id="i12n_default_values-3D-method" class="method-detail ">
+          <a name="method-i-i12n_default_values-3D"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_on_NameError=</span><span
+            <span class="method-name">i12n_default_values=</span><span
+              class="method-args">(val)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="i12n_default_values-3D-source">
+<pre>
+<span class="ruby-comment"># File lib/instantiation.rb, line 315</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_default_values=</span>(<span class="ruby-identifier">val</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>,
+                                     <span class="ruby-value">:default_values</span>,
+                                     <span class="ruby-identifier">val</span>,
+                                     <span class="ruby-value">:nonBoolean</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- i12n_default_values-3D-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- i12n_default_values-3D-method -->
+
+      
+        <div id="i12n_on_NameError-method" class="method-detail ">
+          <a name="method-i-i12n_on_NameError"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">i12n_on_NameError</span><span
+              class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="i12n_on_NameError-source">
+<pre>
+<span class="ruby-comment"># File lib/instantiation.rb, line 356</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_on_NameError</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-value">:raise</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- i12n_on_NameError-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- i12n_on_NameError-method -->
+
+      
+        <div id="i12n_on_NameError-3D-method" class="method-detail ">
+          <a name="method-i-i12n_on_NameError-3D"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">i12n_on_NameError=</span><span
               class="method-args">(action)</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
@@ -578,29 +642,29 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_on_NameError-3D-source">
+            <div class="method-source-code" id="i12n_on_NameError-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 290</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_on_NameError=</span>(<span class="ruby-identifier">action</span>)
-  <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">action</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">construction_on_NameError</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 322</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_on_NameError=</span>(<span class="ruby-identifier">action</span>)
+  <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">set_NameError_action</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">action</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">i12n_on_NameError</span>
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_on_NameError-3D-source -->
+            </div><!-- i12n_on_NameError-3D-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_on_NameError-3D-method -->
+        </div><!-- i12n_on_NameError-3D-method -->
 
       
-        <div id="construction_overwrite_values-method" class="method-detail ">
-          <a name="method-i-construction_overwrite_values"></a>
+        <div id="i12n_overwrite_values-method" class="method-detail ">
+          <a name="method-i-i12n_overwrite_values"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_overwrite_values</span><span
+            <span class="method-name">i12n_overwrite_values</span><span
               class="method-args">()</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
@@ -612,29 +676,29 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_overwrite_values-source">
+            <div class="method-source-code" id="i12n_overwrite_values-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 311</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_overwrite_values</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 360</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_overwrite_values</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">true</span>
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_overwrite_values-source -->
+            </div><!-- i12n_overwrite_values-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_overwrite_values-method -->
+        </div><!-- i12n_overwrite_values-method -->
 
       
-        <div id="construction_overwrite_values-3D-method" class="method-detail ">
-          <a name="method-i-construction_overwrite_values-3D"></a>
+        <div id="i12n_overwrite_values-3D-method" class="method-detail ">
+          <a name="method-i-i12n_overwrite_values-3D"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_overwrite_values=</span><span
-              class="method-args">(bool)</span>
+            <span class="method-name">i12n_overwrite_values=</span><span
+              class="method-args">(val)</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
           
@@ -645,28 +709,31 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_overwrite_values-3D-source">
+            <div class="method-source-code" id="i12n_overwrite_values-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 295</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_overwrite_values=</span>(<span class="ruby-identifier">bool</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:overwrite_values</span>, <span class="ruby-identifier">bool</span>)
+<span class="ruby-comment"># File lib/instantiation.rb, line 327</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_overwrite_values=</span>(<span class="ruby-identifier">val</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>,
+                                     <span class="ruby-value">:overwrite_values</span>,
+                                     <span class="ruby-identifier">val</span>,
+                                     <span class="ruby-value">:Boolean</span>)
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_overwrite_values-3D-source -->
+            </div><!-- i12n_overwrite_values-3D-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_overwrite_values-3D-method -->
+        </div><!-- i12n_overwrite_values-3D-method -->
 
       
-        <div id="construction_use_accessors-method" class="method-detail ">
-          <a name="method-i-construction_use_accessors"></a>
+        <div id="i12n_require_accessors-method" class="method-detail ">
+          <a name="method-i-i12n_require_accessors"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_use_accessors</span><span
+            <span class="method-name">i12n_require_accessors</span><span
               class="method-args">()</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
@@ -678,29 +745,29 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_use_accessors-source">
+            <div class="method-source-code" id="i12n_require_accessors-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 315</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_use_accessors</span>
+<span class="ruby-comment"># File lib/instantiation.rb, line 364</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_require_accessors</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_use_accessors-source -->
+            </div><!-- i12n_require_accessors-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_use_accessors-method -->
+        </div><!-- i12n_require_accessors-method -->
 
       
-        <div id="construction_use_accessors-3D-method" class="method-detail ">
-          <a name="method-i-construction_use_accessors-3D"></a>
+        <div id="i12n_require_accessors-3D-method" class="method-detail ">
+          <a name="method-i-i12n_require_accessors-3D"></a>
 
           
           <div class="method-heading">
-            <span class="method-name">construction_use_accessors=</span><span
-              class="method-args">(bool)</span>
+            <span class="method-name">i12n_require_accessors=</span><span
+              class="method-args">(val)</span>
             <span class="method-click-advice">click to toggle source</span>
           </div>
           
@@ -711,20 +778,92 @@ just provide the defaults, as it were.</p>
             
 
             
-            <div class="method-source-code" id="construction_use_accessors-3D-source">
+            <div class="method-source-code" id="i12n_require_accessors-3D-source">
 <pre>
-<span class="ruby-comment"># File lib/construction.rb, line 299</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">construction_use_accessors=</span>(<span class="ruby-identifier">bool</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-constant">Construction</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>, <span class="ruby-value">:use_accessors</span>, <span class="ruby-identifier">bool</span>)
+<span class="ruby-comment"># File lib/instantiation.rb, line 334</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_require_accessors=</span>(<span class="ruby-identifier">val</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>,
+                                     <span class="ruby-value">:require_accessors</span>,
+                                     <span class="ruby-identifier">val</span>,
+                                     <span class="ruby-value">:Boolean</span>)
 <span class="ruby-keyword">end</span></pre>
-            </div><!-- construction_use_accessors-3D-source -->
+            </div><!-- i12n_require_accessors-3D-source -->
             
           </div>
 
           
 
           
-        </div><!-- construction_use_accessors-3D-method -->
+        </div><!-- i12n_require_accessors-3D-method -->
+
+      
+        <div id="i12n_use_accessors-method" class="method-detail ">
+          <a name="method-i-i12n_use_accessors"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">i12n_use_accessors</span><span
+              class="method-args">()</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="i12n_use_accessors-source">
+<pre>
+<span class="ruby-comment"># File lib/instantiation.rb, line 368</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_use_accessors</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- i12n_use_accessors-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- i12n_use_accessors-method -->
+
+      
+        <div id="i12n_use_accessors-3D-method" class="method-detail ">
+          <a name="method-i-i12n_use_accessors-3D"></a>
+
+          
+          <div class="method-heading">
+            <span class="method-name">i12n_use_accessors=</span><span
+              class="method-args">(val)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+          
+
+          <div class="method-description">
+            
+            
+            
+
+            
+            <div class="method-source-code" id="i12n_use_accessors-3D-source">
+<pre>
+<span class="ruby-comment"># File lib/instantiation.rb, line 341</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">i12n_use_accessors=</span>(<span class="ruby-identifier">val</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">CXN</span>.<span class="ruby-identifier">declare_option_accessor</span>(<span class="ruby-keyword">self</span>,
+                                     <span class="ruby-value">:use_accessors</span>,
+                                     <span class="ruby-identifier">val</span>,
+                                     <span class="ruby-value">:Boolean</span>)
+<span class="ruby-keyword">end</span></pre>
+            </div><!-- i12n_use_accessors-3D-source -->
+            
+          </div>
+
+          
+
+          
+        </div><!-- i12n_use_accessors-3D-method -->
 
       
       </div><!-- public-instance-method-details -->
